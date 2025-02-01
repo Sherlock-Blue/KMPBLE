@@ -1,7 +1,10 @@
 package peripheral.coroutines
 
 import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.callbacks.CallbackError
 import com.sherlockblue.kmpble.callbacks.CentralManagerCallbacks
+import com.sherlockblue.kmpble.callbacks.OnCharacteristicsDiscovered
+import com.sherlockblue.kmpble.callbacks.OnDescriptorsDiscovered
 import com.sherlockblue.kmpble.callbacks.PeripheralCallbacks
 import com.sherlockblue.kmpble.fixtures.DEFAULT_TEST_RUNS
 import com.sherlockblue.kmpble.fixtures.DEFAULT_UUID
@@ -202,7 +205,7 @@ class PeripheralTest {
     }
 
   @Test
-  fun `discoverCharacteristics function returns BleResponse`() =
+  fun `discoverCharacteristics function returns OnCharacteristicsDiscovered`() =
     runTest {
       launch {
         // Arrange
@@ -223,7 +226,7 @@ class PeripheralTest {
         val discoverCharacteristicsEvent = testPeripheral.discoverCharacteristicsForService(DEFAULT_UUID)
 
         // Assert
-        assertTrue(discoverCharacteristicsEvent is BleResponse.Error) // TODO
+        assertTrue(discoverCharacteristicsEvent is OnCharacteristicsDiscovered)
         testPeripheral.disconnect()
       }
     }
@@ -256,7 +259,7 @@ class PeripheralTest {
     }
 
   @Test
-  fun `discoverDescriptors function returns BleResponse`() =
+  fun `discoverDescriptors function returns OnDescriptorsDiscovered`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -277,7 +280,7 @@ class PeripheralTest {
         val discoverDescriptorsEvent = testPeripheral.discoverDescriptors(DEFAULT_UUID)
 
         // Assert
-        assertTrue(discoverDescriptorsEvent is BleResponse.Error) // TODO
+        assertTrue(discoverDescriptorsEvent is OnDescriptorsDiscovered)
         testPeripheral.disconnect()
       }
     }
