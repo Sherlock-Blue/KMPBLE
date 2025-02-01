@@ -78,7 +78,7 @@ class PeripheralServicesTest {
     }
 
   @Test
-  fun `Null Gatt returns empty Services structure`() =
+  fun `Gatt with null services returns empty Services structure`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -96,7 +96,7 @@ class PeripheralServicesTest {
           events =
             listOf(
               OnConnectionStateChange(
-                gatt = null,
+                gatt = mockGatt,
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
               ),
@@ -122,7 +122,7 @@ class PeripheralServicesTest {
     }
 
   @Test
-  fun `Null Gatt services returns empty Services structure`() =
+  fun `Null Gatt returns empty Services structure`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -140,7 +140,7 @@ class PeripheralServicesTest {
           events =
             listOf(
               OnConnectionStateChange(
-                gatt = mockGatt,
+                gatt = null,
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
               ),

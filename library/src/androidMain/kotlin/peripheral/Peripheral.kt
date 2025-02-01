@@ -50,7 +50,12 @@ actual class Peripheral(
     _connected.value = status == BluetoothGatt.STATE_CONNECTED
   }
 
-  actual fun getServices() = gatt?.services?.getServices() ?: listOf<Service>()
+  actual fun getServices(): List<Service> {
+    // Obeying Law of Demeter
+    val nativeServices = gatt?.services
+    val xPlatformServices = nativeServices?.getServices()
+    return xPlatformServices ?: listOf<Service>()
+  }
 
   internal var gatt: BluetoothGatt? = null
 
