@@ -3,23 +3,22 @@
 # Run `pod lib lint kmpble.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'kmpble'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter BLE package.'
-  s.description      = <<-DESC
-A new Flutter BLE package.
-                       DESC
-  s.homepage         = 'http://example.com'
-  s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
-  s.source           = { :path => '.' }
+  s.name           = 'KMPBLE'
+  s.version        = package['0.1.0']
+  s.summary        = package['Cross Platform BLE']
+  s.description    = package['Sherlock Blue KMPBLE']
+  s.license        = package['license']
+  s.author         = package['Janus Cole']
+  s.homepage       = package['https://www.sherlockblue.com']
+  s.platform       = :ios, '13.0'
+  s.swift_version  = '5.4'
+  s.source         = { :path '/Users/$username/.m2/repository/com/sherlockblue/KMPBLE/library-android/0.1.0' }
+  s.static_framework = true
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  s.swift_version = '5.0'
 
   # If your plugin requires a privacy manifest, for example if it uses any
   # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your

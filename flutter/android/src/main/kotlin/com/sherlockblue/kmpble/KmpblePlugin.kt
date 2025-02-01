@@ -31,7 +31,7 @@ class KmpblePlugin: FlutterPlugin, MethodCallHandler {
       }
       "getPlatformInfoScanner" -> {
         val scanner = Scanner()
-        result.success(scanner.getPlatformInfoPeripheral())
+        result.success(scanner.getPlatformInfoScanner())
       }
       "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
