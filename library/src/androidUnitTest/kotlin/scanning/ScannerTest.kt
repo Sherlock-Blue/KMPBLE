@@ -6,7 +6,6 @@ import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.content.Context
 import ble.fixtures.MockSparseArray
-import com.sherlockblue.kmpble.ble.fixtures.DEFAULT_ADVERTISING_DATA
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothAdapter
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothLeScanner
@@ -14,8 +13,9 @@ import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothManager
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothSystemContext
 import com.sherlockblue.kmpble.ble.fixtures.MockScanRecord
 import com.sherlockblue.kmpble.ble.fixtures.MockScanResult
+import com.sherlockblue.kmpble.ble.fixtures.TEST_ADVERTISING_DATA
 import com.sherlockblue.kmpble.ble.fixtures.TEST_RSSI
-import com.sherlockblue.kmpble.ble.fixtures.mockServiceData
+import com.sherlockblue.kmpble.ble.fixtures.TEST_SERVICE_DATA
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.cancel
@@ -31,12 +31,12 @@ class ScannerTest {
       launch {
         // Arrange
         // Mocked Fixtures
-        val mockBytes = DEFAULT_ADVERTISING_DATA
+        val mockBytes = TEST_ADVERTISING_DATA
         val mockScanRecord =
           MockScanRecord.Builder()
             .setDeviceName("Test Name")
             .setTxPowerLevel(TEST_RSSI)
-            .setServiceData(mockServiceData)
+            .setServiceData(TEST_SERVICE_DATA)
             .setManufacturerData(MockSparseArray.Builder().build())
             .setBytes(mockBytes)
             .build()
@@ -48,7 +48,7 @@ class ScannerTest {
             .build()
         val mockBluetoothLeScanner: BluetoothLeScanner =
           MockBluetoothLeScanner.Builder()
-            .setScannerResults(listOf(MockBluetoothLeScanner.ScannerScanResult(callbackType = 0, result = mockScanResult)))
+            .setScannerResults(listOf(MockBluetoothLeScanner.MockScannerScanResult(callbackType = 0, result = mockScanResult)))
             .build()
         val mockBluetoothAdapter: BluetoothAdapter =
           MockBluetoothAdapter.Builder()
@@ -88,7 +88,7 @@ class ScannerTest {
             .build()
         val mockBluetoothLeScanner: BluetoothLeScanner =
           MockBluetoothLeScanner.Builder()
-            .setScannerResults(listOf(MockBluetoothLeScanner.ScannerScanResult(callbackType = 0, result = mockScanResult)))
+            .setScannerResults(listOf(MockBluetoothLeScanner.MockScannerScanResult(callbackType = 0, result = mockScanResult)))
             .build()
         val mockBluetoothAdapter: BluetoothAdapter =
           MockBluetoothAdapter.Builder()
@@ -129,7 +129,7 @@ class ScannerTest {
             .build()
         val mockBluetoothLeScanner: BluetoothLeScanner =
           MockBluetoothLeScanner.Builder()
-            .setScannerResults(listOf(MockBluetoothLeScanner.ScannerScanResult(callbackType = 0, result = mockScanResult)))
+            .setScannerResults(listOf(MockBluetoothLeScanner.MockScannerScanResult(callbackType = 0, result = mockScanResult)))
             .build()
         val mockBluetoothAdapter: BluetoothAdapter =
           MockBluetoothAdapter.Builder()
@@ -170,7 +170,7 @@ class ScannerTest {
             .build()
         val mockBluetoothLeScanner: BluetoothLeScanner =
           MockBluetoothLeScanner.Builder()
-            .setScannerResults(listOf(MockBluetoothLeScanner.ScannerScanResult(callbackType = 0, result = mockScanResult)))
+            .setScannerResults(listOf(MockBluetoothLeScanner.MockScannerScanResult(callbackType = 0, result = mockScanResult)))
             .build()
         val mockBluetoothAdapter: BluetoothAdapter =
           MockBluetoothAdapter.Builder()
@@ -292,7 +292,7 @@ class ScannerTest {
             .build()
         val mockBluetoothLeScanner: BluetoothLeScanner =
           MockBluetoothLeScanner.Builder()
-            .setScannerResults(listOf(MockBluetoothLeScanner.ScannerScanResult(callbackType = 0, result = mockScanResult)))
+            .setScannerResults(listOf(MockBluetoothLeScanner.MockScannerScanResult(callbackType = 0, result = mockScanResult)))
             .build()
         val mockBluetoothAdapter: BluetoothAdapter =
           MockBluetoothAdapter.Builder()
@@ -328,12 +328,12 @@ class ScannerTest {
       launch {
         // Arrange
         // Mocked Fixtures
-        val mockBytes = DEFAULT_ADVERTISING_DATA
+        val mockBytes = TEST_ADVERTISING_DATA
         val mockScanRecord =
           MockScanRecord.Builder()
             .setDeviceName("Test Name")
             .setTxPowerLevel(TEST_RSSI)
-            .setServiceData(mockServiceData)
+            .setServiceData(TEST_SERVICE_DATA)
             .setManufacturerData(MockSparseArray.Builder().build())
             .setBytes(mockBytes)
             .build()
@@ -345,7 +345,7 @@ class ScannerTest {
             .build()
         val mockBluetoothLeScanner: BluetoothLeScanner =
           MockBluetoothLeScanner.Builder()
-            .setScannerResults(listOf(MockBluetoothLeScanner.ScannerScanResult(callbackType = 0, result = mockScanResult)))
+            .setScannerResults(listOf(MockBluetoothLeScanner.MockScannerScanResult(callbackType = 0, result = mockScanResult)))
             .build()
         val mockBluetoothAdapter: BluetoothAdapter =
           MockBluetoothAdapter.Builder()

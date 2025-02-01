@@ -7,13 +7,13 @@ import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
 import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicWrite
-import com.sherlockblue.kmpble.ble.fixtures.DEFAULT_UUID
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCallback
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCharacteristic
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattService
 import com.sherlockblue.kmpble.ble.fixtures.MockMutableSharedFlow
+import com.sherlockblue.kmpble.ble.fixtures.TEST_UUID
 import com.sherlockblue.kmpble.peripheral.Peripheral
 import io.mockk.mockk
 import kotlinx.coroutines.cancel
@@ -45,7 +45,7 @@ class PeripheralWriteCharacteristicTest {
           )
 
         // Assert
-        Assert.assertTrue(peripheral.writeCharacteristic(DEFAULT_UUID, data = byteArrayOf()) is BleResponse.Error)
+        Assert.assertTrue(peripheral.writeCharacteristic(TEST_UUID, data = byteArrayOf()) is BleResponse.Error)
 
         this.cancel()
       }
@@ -120,7 +120,7 @@ class PeripheralWriteCharacteristicTest {
           }
 
         // Assert
-        Assert.assertTrue(peripheral.writeCharacteristic(DEFAULT_UUID, data = byteArrayOf()) is BleResponse.CharacteristicWrite)
+        Assert.assertTrue(peripheral.writeCharacteristic(TEST_UUID, data = byteArrayOf()) is BleResponse.CharacteristicWrite)
 
         this.cancel()
       }
@@ -209,7 +209,7 @@ class PeripheralWriteCharacteristicTest {
           }
 
         // Assert
-        Assert.assertTrue(peripheral.writeCharacteristic(DEFAULT_UUID, byteArrayOf()) is BleResponse.CharacteristicWrite)
+        Assert.assertTrue(peripheral.writeCharacteristic(TEST_UUID, byteArrayOf()) is BleResponse.CharacteristicWrite)
 
         this.cancel()
       }

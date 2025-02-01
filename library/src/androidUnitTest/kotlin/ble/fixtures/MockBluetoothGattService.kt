@@ -8,7 +8,7 @@ import java.util.UUID
 
 class MockBluetoothGattService {
   class Builder() {
-    private var mockUUID: UUID = UUID.fromString(DEFAULT_UUID)
+    private var mockUUID: UUID = UUID.fromString(TEST_UUID)
     private var mockCharacteristics: List<BluetoothGattCharacteristic> = listOf()
 
     fun setUUID(newUUID: String): Builder {

@@ -7,13 +7,13 @@ import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
 import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicRead
-import com.sherlockblue.kmpble.ble.fixtures.DEFAULT_UUID
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCallback
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCharacteristic
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattService
 import com.sherlockblue.kmpble.ble.fixtures.MockMutableSharedFlow
+import com.sherlockblue.kmpble.ble.fixtures.TEST_UUID
 import com.sherlockblue.kmpble.peripheral.Peripheral
 import io.mockk.mockk
 import kotlinx.coroutines.cancel
@@ -45,7 +45,7 @@ class PeripheralReadCharacteristicTest {
           )
 
         // Act
-        peripheral.readCharacteristic(DEFAULT_UUID) { bleEvent ->
+        peripheral.readCharacteristic(TEST_UUID) { bleEvent ->
           // Assert
           Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
@@ -129,7 +129,7 @@ class PeripheralReadCharacteristicTest {
           }
 
         // Act
-        peripheral.readCharacteristic(DEFAULT_UUID) { bleEvent ->
+        peripheral.readCharacteristic(TEST_UUID) { bleEvent ->
           // Assert
           Assert.assertTrue(bleEvent is BleResponse.CharacteristicRead)
           this.cancel()
@@ -263,7 +263,7 @@ class PeripheralReadCharacteristicTest {
           }
 
         // Act
-        peripheral.readCharacteristic(DEFAULT_UUID) { bleEvent ->
+        peripheral.readCharacteristic(TEST_UUID) { bleEvent ->
           // Assert
           Assert.assertTrue(bleEvent is BleResponse.CharacteristicRead)
           this.cancel()

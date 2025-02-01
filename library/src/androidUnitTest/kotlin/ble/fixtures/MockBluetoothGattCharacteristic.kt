@@ -9,7 +9,7 @@ import java.util.UUID
 
 class MockBluetoothGattCharacteristic {
   class Builder() {
-    private var mockUUID: UUID = UUID.fromString(DEFAULT_UUID)
+    private var mockUUID: UUID = UUID.fromString(TEST_UUID)
     private var mockService: BluetoothGattService = MockBluetoothGattService.Builder().build()
     private var mockDescriptors: List<BluetoothGattDescriptor> = listOf()
     private var mockValue: ByteArray = byteArrayOf()

@@ -10,9 +10,9 @@ import io.mockk.mockkClass
 
 class MockBluetoothLeScanner {
   class Builder() {
-    private var mockScannerResults = listOf<ScannerScanResult>()
+    private var mockScannerResults = listOf<MockScannerScanResult>()
 
-    fun setScannerResults(newScannerResults: List<ScannerScanResult>): Builder {
+    fun setScannerResults(newScannerResults: List<MockScannerScanResult>): Builder {
       this.mockScannerResults = newScannerResults
       return this
     }
@@ -53,7 +53,7 @@ class MockBluetoothLeScanner {
       }
   }
 
-  data class ScannerScanResult(
+  data class MockScannerScanResult(
     val callbackType: Int,
     val result: android.bluetooth.le.ScanResult?,
   )

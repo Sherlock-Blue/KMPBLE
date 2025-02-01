@@ -1,7 +1,6 @@
 package peripheral.coroutines
 
 import com.sherlockblue.kmpble.ble.BleResponse
-import com.sherlockblue.kmpble.callbacks.CallbackError
 import com.sherlockblue.kmpble.callbacks.CentralManagerCallbacks
 import com.sherlockblue.kmpble.callbacks.OnCharacteristicsDiscovered
 import com.sherlockblue.kmpble.callbacks.OnDescriptorsDiscovered

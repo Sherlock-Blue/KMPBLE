@@ -1,6 +1,7 @@
 package ble.fixtures
 
 import com.sherlockblue.kmpble.ble.fixtures.MockAdvertisingData
+import com.sherlockblue.kmpble.ble.fixtures.TEST_DEVICE_NAME
 import org.junit.Assert
 import org.junit.Test
 
@@ -9,7 +10,7 @@ class MockAdvertisementTest {
   fun `MockAdvertisingData correctly populates the name field in the output array`() {
     // Arrange
     // Mocked Fixtures
-    val testName = "Test Device Name"
+    val testName = TEST_DEVICE_NAME
 
     // Act
     val advertisingData =

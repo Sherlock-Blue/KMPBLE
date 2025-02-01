@@ -9,8 +9,8 @@ import io.mockk.mockk
 
 class MockBluetoothDevice {
   class Builder() {
-    private var mockName = "Mock Device Name"
-    private var mockAddress = "Mock Device Address"
+    private var mockName = TEST_DEVICE_NAME
+    private var mockAddress = TEST_DEVICE_ADDRESS
     private var mockGatt: BluetoothGatt? = null
     private var mockCallbackHandler: BluetoothGattCallback = mockk()
 
