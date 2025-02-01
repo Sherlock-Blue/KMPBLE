@@ -4,8 +4,11 @@ import android.bluetooth.BluetoothGatt
 import com.sherlockblue.kmpble.DEFAULT_MTU_SIZE
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
+import com.sherlockblue.kmpble.ble.fixtures.TEST_MTU
 import com.sherlockblue.kmpble.ble.fixtures.TEST_RSSI
+import com.sherlockblue.kmpble.ble.fixtures.TEST_RX
 import com.sherlockblue.kmpble.ble.fixtures.TEST_STATUS
+import com.sherlockblue.kmpble.ble.fixtures.TEST_TX
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -83,8 +86,8 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
-      val mockMtu = Int.MAX_VALUE
+      val mockStatus = TEST_STATUS
+      val mockMtu = TEST_MTU
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -103,7 +106,7 @@ class CommonEventsTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockStatus = TEST_STATUS
-      val mockMtu = Int.MAX_VALUE
+      val mockMtu = TEST_MTU
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -209,7 +212,7 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -288,8 +291,8 @@ class CommonEventsTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockStatus = TEST_STATUS
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -308,8 +311,8 @@ class CommonEventsTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockStatus = TEST_STATUS
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -329,8 +332,8 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -350,8 +353,8 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -373,8 +376,8 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -393,8 +396,8 @@ class CommonEventsTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockStatus = TEST_STATUS
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -414,8 +417,8 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -435,8 +438,8 @@ class CommonEventsTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
+      val mockTx = TEST_TX
+      val mockRx = TEST_RX
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)

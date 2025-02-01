@@ -62,7 +62,7 @@ class CommonDescriptorEventsTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockDescriptor: BluetoothGattDescriptor = MockBluetoothGattDescriptor.Builder().build()
-      val mockStatus = Int.MAX_VALUE
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)

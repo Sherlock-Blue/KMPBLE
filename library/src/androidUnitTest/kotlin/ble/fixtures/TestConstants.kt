@@ -5,6 +5,12 @@ import ble.fixtures.MockParcelUUID
 val TEST_DEVICE_NAME = "TEST DEVICE NAME"
 val TEST_DEVICE_ADDRESS = "TEST DEVICE ADDRESS"
 val TEST_UUID = "00000000-0000-1000-8000-00805F9B34FB"
+
+val TEST_MTU = Int.MAX_VALUE // i.e. A number that would never be returned for MTU
+
+val TEST_TX = Int.MIN_VALUE // i.e. A number that would never be returned for Tx
+val TEST_RX = Int.MAX_VALUE // i.e. A number that would never be returned by Rx
+
 val TEST_RSSI = Int.MIN_VALUE // i.e. A number that would never be returned for RSSI
 val TEST_STATUS = Int.MAX_VALUE // i.e. A number that would never be returned by GATT
 
