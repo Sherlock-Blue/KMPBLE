@@ -3,6 +3,7 @@ package com.sherlockblue.kmpble.scanning
 import android.bluetooth.le.ScanResult
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.core.util.forEach
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun advertisementDataFromScanResult(scanResult: ScanResult): AdvertisementData =
@@ -15,12 +16,9 @@ fun advertisementDataFromScanResult(scanResult: ScanResult): AdvertisementData =
     advertisingInterval = scanResult.periodicAdvertisingInterval,
     manufacturerData =
       mutableListOf<ManufacturerData>().apply {
-        for (index in 0 until scanResult.scanRecord!!.manufacturerSpecificData.size()) {
-          add(ManufacturerData(scanResult.scanRecord!!.manufacturerSpecificData.valueAt(index)))
-        }
-/*        scanResult.scanRecord!!.manufacturerSpecificData.forEach { _, value ->
+        scanResult.scanRecord!!.manufacturerSpecificData.forEach { _, value ->
           add(ManufacturerData(value))
-        }*/
+        }
       },
     serviceData =
       scanResult.scanRecord!!.serviceData.keys.fold(mutableListOf<ServiceData>(), { mutableList, serviceUuid ->

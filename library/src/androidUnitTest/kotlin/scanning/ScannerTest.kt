@@ -31,9 +31,18 @@ class ScannerTest {
       launch {
         // Arrange
         // Mocked Fixtures
+        val mockBytes = DEFAULT_ADVERTISING_DATA
+        val mockScanRecord =
+          MockScanRecord.Builder()
+            .setDeviceName("Test Name")
+            .setTxPowerLevel(TEST_RSSI)
+            .setServiceData(mockServiceData)
+            .setManufacturerData(MockSparseArray.Builder().build())
+            .setBytes(mockBytes)
+            .build()
         val mockScanResult =
           MockScanResult.Builder()
-            .setScanRecord(MockScanRecord.Builder().build())
+            .setScanRecord(mockScanRecord)
             .setDevice(MockBluetoothDevice.Builder().build())
             .setRssi(mockk<Int>(relaxed = true))
             .build()

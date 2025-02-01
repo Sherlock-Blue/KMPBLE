@@ -62,6 +62,7 @@ class MockScanRecord {
         every { txPowerLevel } returns mockTxPowerLevel
         every { manufacturerSpecificData } returns mockManufacturerSpecificData
         every { manufacturerSpecificData.size() } returns 1
+        every { manufacturerSpecificData.keyAt(any()) } returns 0
         every { manufacturerSpecificData.valueAt(any()) } returns
           byteArrayOf(
             0x1A.toByte(),
