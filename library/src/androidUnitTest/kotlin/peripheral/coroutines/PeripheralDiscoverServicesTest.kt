@@ -3,8 +3,10 @@ package peripheral.coroutines
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnServicesDiscovered
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCallback
@@ -40,7 +42,7 @@ class PeripheralDiscoverServicesTest {
           )
 
         // Assert
-        Assert.assertTrue(peripheral.discoverServices() is BleEvent.CallbackError)
+        Assert.assertTrue(peripheral.discoverServices() is BleResponse.Error)
 
         this.cancel()
       }
@@ -57,10 +59,10 @@ class PeripheralDiscoverServicesTest {
           .setCallbackHandler(mockk<GattCallbackHandler>(relaxed = true))
           .build()
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnServicesDiscovered(
+              OnServicesDiscovered(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
               ),
@@ -71,7 +73,7 @@ class PeripheralDiscoverServicesTest {
       launch {
         // Prepare object under test
         val gattCallbackHandler = GattCallbackHandler(this)
-        gattCallbackHandler._eventBus = mockEventBus
+        gattCallbackHandler._nativeEventBus = mockEventBus
         val peripheral =
           Peripheral(
             device = mockDevice,
@@ -83,7 +85,7 @@ class PeripheralDiscoverServicesTest {
           }
 
         // Assert
-        Assert.assertTrue(peripheral.discoverServices() is BleEvent.OnServicesDiscovered)
+        Assert.assertTrue(peripheral.discoverServices() is BleResponse.ServicesDiscovered)
 
         this.cancel()
       }
@@ -99,7 +101,7 @@ class PeripheralDiscoverServicesTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnServicesDiscovered(
+              OnServicesDiscovered(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
               ),
@@ -127,7 +129,7 @@ class PeripheralDiscoverServicesTest {
           }
 
         // Assert
-        Assert.assertTrue(peripheral.discoverServices() is BleEvent.OnServicesDiscovered)
+        Assert.assertTrue(peripheral.discoverServices() is BleResponse.ServicesDiscovered)
 
         this.cancel()
       }

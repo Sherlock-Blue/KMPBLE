@@ -1,12 +1,23 @@
 package com.sherlockblue.kmpble.peripheral
 
 import com.sherlockblue.kmpble.ble.BleResponse
-import com.sherlockblue.kmpble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.Service
 import com.sherlockblue.kmpble.callbacks.CentralManagerCallbacks
+import com.sherlockblue.kmpble.callbacks.OnCharacteristicRead
+import com.sherlockblue.kmpble.callbacks.OnCharacteristicWrite
+import com.sherlockblue.kmpble.callbacks.OnCharacteristicsDiscovered
+import com.sherlockblue.kmpble.callbacks.OnDescriptorRead
+import com.sherlockblue.kmpble.callbacks.OnDescriptorWrite
+import com.sherlockblue.kmpble.callbacks.OnDescriptorsDiscovered
+import com.sherlockblue.kmpble.callbacks.OnPeripheralConnect
+import com.sherlockblue.kmpble.callbacks.OnPeripheralDisconnect
+import com.sherlockblue.kmpble.callbacks.OnServicesDiscovered
 import com.sherlockblue.kmpble.callbacks.PeripheralCallbacks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -15,6 +26,7 @@ import platform.CoreBluetooth.CBCharacteristic
 import platform.CoreBluetooth.CBDescriptor
 import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBService
+import utils.getServices
 import utils.toNSData
 import kotlin.coroutines.resume
 
@@ -26,7 +38,31 @@ actual class Peripheral(
   private val centralManagerDelegate: CentralManagerCallbacks = centralManager.delegate as CentralManagerCallbacks
   private var peripheralDelegate: PeripheralCallbacks = peripheral.delegate as PeripheralCallbacks
 
+  actual fun nativeEventBus(): Flow<com.sherlockblue.kmpble.ble.NativeBleEvent> =
+    merge(
+      centralManagerDelegate.nativeEventBus(),
+      peripheralDelegate.nativeEventBus(),
+    )
+
   actual fun eventBus(): Flow<BleResponse> = merge(centralManagerDelegate.eventBus(), peripheralDelegate.eventBus())
+
+  private val _connected = MutableStateFlow<Boolean>(false)
+
+  actual fun connected() = _connected as StateFlow<Boolean>
+
+  private var _services: List<Service> = listOf()
+
+  actual fun getServices() = peripheral.services?.getServices() ?: listOf()
+
+  private val monitorConnectionStatus =
+    coroutineScope.launch {
+      centralManagerDelegate.nativeEventBus().collect { event ->
+        when (event) {
+          is OnPeripheralConnect -> _connected.value = true
+          is OnPeripheralDisconnect -> _connected.value = false
+        }
+      }
+    }
 
   actual fun connect(callback: (BleResponse) -> Unit) {
     coroutineScope.launch {
@@ -37,9 +73,10 @@ actual class Peripheral(
   actual suspend fun connect(): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        centralManagerDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnPeripheralConnect) {
-            continuation.resume(bleEvent)
+        centralManagerDelegate.nativeEventBus().collect {
+          if (it is OnPeripheralConnect) {
+            monitorConnectionStatus.start()
+            continuation.resume(it.toBleResponse())
             cancel()
           }
         }
@@ -57,9 +94,10 @@ actual class Peripheral(
   actual suspend fun disconnect(): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        centralManagerDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnPeripheralDisconnect) {
-            continuation.resume(bleEvent)
+        centralManagerDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnPeripheralDisconnect) {
+            monitorConnectionStatus.cancel()
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -77,9 +115,9 @@ actual class Peripheral(
   actual suspend fun discoverServices(): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnServicesDiscovered) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnServicesDiscovered) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -100,9 +138,9 @@ actual class Peripheral(
   suspend fun discoverCharacteristicsForService(uuid: String): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnCharacteristicsDiscovered) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnCharacteristicsDiscovered) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -125,9 +163,9 @@ actual class Peripheral(
   suspend fun discoverDescriptors(uuid: String): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnDescriptorsDiscovered) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnDescriptorsDiscovered) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -150,9 +188,9 @@ actual class Peripheral(
   actual suspend fun readCharacteristic(uuid: String): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnCharacteristicUpdated) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnCharacteristicRead) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -177,9 +215,9 @@ actual class Peripheral(
   ): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnCharacteristicWrite) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnCharacteristicWrite) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -204,9 +242,9 @@ actual class Peripheral(
   ): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnDescriptorUpdated) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnDescriptorRead) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }
@@ -234,9 +272,9 @@ actual class Peripheral(
   ): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       coroutineScope.launch {
-        peripheralDelegate.eventBus().collect { bleEvent ->
-          if (bleEvent is BleEvent.OnDescriptorWrite) {
-            continuation.resume(bleEvent)
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if (bleEvent is OnDescriptorWrite) {
+            continuation.resume(bleEvent.toBleResponse())
             cancel()
           }
         }

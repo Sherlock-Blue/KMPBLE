@@ -7,20 +7,8 @@ import android.bluetooth.BluetoothGattDescriptor
 import com.sherlockblue.kmpble.NULL_CHARACTERISTIC_ERROR
 import com.sherlockblue.kmpble.NULL_DESCRIPTOR_ERROR
 import com.sherlockblue.kmpble.NULL_GATT_ERROR
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.CallbackError
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnCharacteristicChanged
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnCharacteristicRead
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnCharacteristicWrite
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnConnectionStateChange
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnDescriptorRead
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnDescriptorWrite
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnMtuChanged
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnPhyRead
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnPhyUpdate
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnReadRemoteRssi
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnReliableWriteCompleted
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnServiceChanged
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnServicesDiscovered
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,13 +16,18 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 class GattCallbackHandler(private val coroutineScope: CoroutineScope) : BluetoothGattCallback() {
-  internal var _eventBus = MutableSharedFlow<BleEvent>()
+  internal var _nativeEventBus = MutableSharedFlow<NativeBleEvent>()
 
-  fun eventBus() = _eventBus as SharedFlow<BleEvent>
+  fun nativeEventBus() = _nativeEventBus as SharedFlow<NativeBleEvent>
 
-  private fun publishEvent(event: BleEvent) {
+  internal var _eventBus = MutableSharedFlow<BleResponse>()
+
+  fun eventBus() = _eventBus as SharedFlow<BleResponse>
+
+  private fun publishEvent(event: NativeBleEvent) {
     coroutineScope.launch {
-      _eventBus.emit(event)
+      _nativeEventBus.emit(event)
+      event.toBleResponse().let { bleResponse -> _eventBus.emit(bleResponse) }
     }
   }
 

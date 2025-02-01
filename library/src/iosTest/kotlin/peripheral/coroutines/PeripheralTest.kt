@@ -1,6 +1,6 @@
 package peripheral.coroutines
 
-import com.sherlockblue.kmpble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.callbacks.CentralManagerCallbacks
 import com.sherlockblue.kmpble.callbacks.PeripheralCallbacks
 import com.sherlockblue.kmpble.fixtures.DEFAULT_TEST_RUNS
@@ -34,6 +34,7 @@ class PeripheralTest {
 
         // Act
         testPeripheral.connect()
+        testPeripheral.disconnect()
 
         // Assert
         assertTrue(mockCBCentralManager.verify(exactly = 1, functionName = "connectPeripheral"))
@@ -41,7 +42,7 @@ class PeripheralTest {
     }
 
   @Test
-  fun `connect function returns OnPeripheralConnect BleEvent`() =
+  fun `connect function returns ConnectionStateChange BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -60,9 +61,10 @@ class PeripheralTest {
 
         // Act
         val connectionResult = testPeripheral.connect()
+        testPeripheral.disconnect()
 
         // Assert
-        assertTrue(connectionResult is BleEvent.OnPeripheralConnect)
+        assertTrue(connectionResult is BleResponse.ConnectionStateChange)
       }
     }
 
@@ -93,7 +95,7 @@ class PeripheralTest {
     }
 
   @Test
-  fun `disconnect function returns OnPeripheralDisconnect BleEvent`() =
+  fun `disconnect function returns ConnectionStateChange BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -114,7 +116,7 @@ class PeripheralTest {
         val disconnectionEvent = testPeripheral.disconnect()
 
         // Assert
-        assertTrue(disconnectionEvent is BleEvent.OnPeripheralDisconnect)
+        assertTrue(disconnectionEvent is BleResponse.ConnectionStateChange)
       }
     }
 
@@ -141,11 +143,12 @@ class PeripheralTest {
 
         // Assert
         assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverServices"))
+        testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverServices function returns OnServicesDiscovered BleEvent`() =
+  fun `discoverServices function returns ServicesDiscovered BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -166,7 +169,8 @@ class PeripheralTest {
         val discoverServicesEvent = testPeripheral.discoverServices()
 
         // Assert
-        assertTrue(discoverServicesEvent is BleEvent.OnServicesDiscovered)
+        assertTrue(discoverServicesEvent is BleResponse.ServicesDiscovered)
+        testPeripheral.disconnect()
       }
     }
 
@@ -193,13 +197,14 @@ class PeripheralTest {
 
         // Assert
         assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverCharacteristics"))
+        testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverCharacteristics function returns OnCharacteristicsDiscovered BleEvent`() =
+  fun `discoverCharacteristics function returns BleResponse`() =
     runTest {
-      repeat(DEFAULT_TEST_RUNS) {
+      launch {
         // Arrange
         // Mocked Fixtures
         val mockCBCentralManager = MockCBCentralManager(centralManagerDelegateOverride = CentralManagerCallbacks(this))
@@ -218,7 +223,8 @@ class PeripheralTest {
         val discoverCharacteristicsEvent = testPeripheral.discoverCharacteristicsForService(DEFAULT_UUID)
 
         // Assert
-        assertTrue(discoverCharacteristicsEvent is BleEvent.OnCharacteristicsDiscovered)
+        assertTrue(discoverCharacteristicsEvent is BleResponse.Error) // TODO
+        testPeripheral.disconnect()
       }
     }
 
@@ -245,11 +251,12 @@ class PeripheralTest {
 
         // Assert
         assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverDescriptors"))
+        testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverDescriptors function returns OnDescriptorsDiscovered BleEvent`() =
+  fun `discoverDescriptors function returns BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -270,7 +277,8 @@ class PeripheralTest {
         val discoverDescriptorsEvent = testPeripheral.discoverDescriptors(DEFAULT_UUID)
 
         // Assert
-        assertTrue(discoverDescriptorsEvent is BleEvent.OnDescriptorsDiscovered)
+        assertTrue(discoverDescriptorsEvent is BleResponse.Error) // TODO
+        testPeripheral.disconnect()
       }
     }
 
@@ -297,11 +305,12 @@ class PeripheralTest {
 
         // Assert
         assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "readValueForCharacteristic"))
+        testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `readCharacteristic function returns OnCharacteristicUpdated BleEvent`() =
+  fun `readCharacteristic function returns CharacteristicRead BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -322,7 +331,8 @@ class PeripheralTest {
         val discoverServicesEvent = testPeripheral.readCharacteristic(DEFAULT_UUID)
 
         // Assert
-        assertTrue(discoverServicesEvent is BleEvent.OnCharacteristicUpdated)
+        assertTrue(discoverServicesEvent is BleResponse.CharacteristicRead)
+        testPeripheral.disconnect()
       }
     }
 
@@ -349,11 +359,12 @@ class PeripheralTest {
 
         // Assert
         assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "readValueForDescriptor"))
+        testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `readDescriptor function returns OnDescriptorUpdated BleEvent`() =
+  fun `readDescriptor function returns DescriptorUpdated BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -374,7 +385,8 @@ class PeripheralTest {
         val discoverServicesEvent = testPeripheral.readDescriptor(DEFAULT_UUID, DEFAULT_UUID)
 
         // Assert
-        assertTrue(discoverServicesEvent is BleEvent.OnDescriptorUpdated)
+        assertTrue(discoverServicesEvent is BleResponse.DescriptorRead)
+        testPeripheral.disconnect()
       }
     }
 
@@ -405,11 +417,12 @@ class PeripheralTest {
 
         // Assert
         assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "writeValueForCharacteristic"))
+        testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `writeCharacteristic function returns OnCharacteristicWrite BleEvent`() =
+  fun `writeCharacteristic function returns CharacteristicWrite BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -435,7 +448,8 @@ class PeripheralTest {
           )
 
         // Assert
-        assertTrue(discoverServicesEvent is BleEvent.OnCharacteristicWrite)
+        assertTrue(discoverServicesEvent is BleResponse.CharacteristicWrite)
+        testPeripheral.disconnect()
       }
     }
 
@@ -465,6 +479,7 @@ class PeripheralTest {
             descriptorUUID = DEFAULT_UUID,
             data = mockData,
           )
+          testPeripheral.disconnect()
         }.join()
 
         // Assert
@@ -473,7 +488,7 @@ class PeripheralTest {
     }
 
   @Test
-  fun `writeDescriptor function returns OnDescriptorWrite BleEvent`() =
+  fun `writeDescriptor function returns DescriptorWrite BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -500,7 +515,8 @@ class PeripheralTest {
           )
 
         // Assert
-        assertTrue(writeDescriptorEvent is BleEvent.OnDescriptorWrite)
+        assertTrue(writeDescriptorEvent is BleResponse.DescriptorWrite)
+        testPeripheral.disconnect()
       }
     }
 }

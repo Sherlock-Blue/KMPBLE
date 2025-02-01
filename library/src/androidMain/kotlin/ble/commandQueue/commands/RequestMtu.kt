@@ -3,7 +3,8 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import com.sherlockblue.kmpble.MAX_MTU_SIZE
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
+import com.sherlockblue.kmpble.ble.callbacks.OnMtuChanged
 import com.sherlockblue.kmpble.ble.commandQueue.BleQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -17,7 +18,7 @@ class RequestMtu(
   private val mtu: Int = MAX_MTU_SIZE,
   private val bleQueue: BleQueue,
   private val coroutineScope: CoroutineScope,
-  private val gattCallbackEventBus: SharedFlow<BleEvent>,
+  private val gattCallbackEventBus: SharedFlow<NativeBleEvent>,
   private val commandCallback: CommandCallback,
 ) : BleCommand(bleQueue = bleQueue) {
   init {
@@ -27,7 +28,7 @@ class RequestMtu(
   override fun execute() {
     coroutineScope.launch {
       gattCallbackEventBus.collect { bleEvent ->
-        if (bleEvent is BleEvent.OnMtuChanged) {
+        if (bleEvent is OnMtuChanged) {
           commandCallback(bleEvent)
           cleanup()
           cancel()

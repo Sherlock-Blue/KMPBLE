@@ -2,8 +2,9 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicRead
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCharacteristic
@@ -28,7 +29,7 @@ class ReadCharacteristicQueueingTest {
             characteristic = MockBluetoothGattCharacteristic.Builder().build(),
             bleQueue = commandQueue,
             coroutineScope = this,
-            gattCallbackEventBus = GattCallbackHandler(this).eventBus(),
+            gattCallbackEventBus = GattCallbackHandler(this).nativeEventBus(),
           ) { }
 
         // Assert
@@ -44,10 +45,10 @@ class ReadCharacteristicQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnCharacteristicRead(
+              OnCharacteristicRead(
                 gatt = MockBluetoothGatt.Builder().build(),
                 characteristic = MockBluetoothGattCharacteristic.Builder().build(),
                 value = byteArrayOf(),
@@ -78,14 +79,14 @@ class ReadCharacteristicQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockBleEvent =
-        BleEvent.OnCharacteristicRead(
+        OnCharacteristicRead(
           gatt = MockBluetoothGatt.Builder().build(),
           characteristic = MockBluetoothGattCharacteristic.Builder().build(),
           value = byteArrayOf(),
           status = BluetoothGatt.GATT_SUCCESS,
         )
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(mockBleEvent),
         )
@@ -119,7 +120,7 @@ class ReadCharacteristicQueueingTest {
           characteristic = MockBluetoothGattCharacteristic.Builder().build(),
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { }
 
         gattCallbackHandler.onCharacteristicRead(
@@ -145,10 +146,10 @@ class ReadCharacteristicQueueingTest {
           characteristic = MockBluetoothGattCharacteristic.Builder().build(),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue(event is BleEvent.OnCharacteristicRead)
+          Assert.assertTrue(event is OnCharacteristicRead)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -183,12 +184,12 @@ class ReadCharacteristicQueueingTest {
           characteristic = MockBluetoothGattCharacteristic.Builder().build(),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnCharacteristicRead).gatt === mockBleGatt1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnCharacteristicRead).characteristic === mockBleCharacteristic1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnCharacteristicRead).status == BluetoothGatt.STATE_DISCONNECTED)
+          Assert.assertTrue((event as OnCharacteristicRead).gatt === mockBleGatt1) // Same instance
+          Assert.assertTrue((event as OnCharacteristicRead).characteristic === mockBleCharacteristic1) // Same instance
+          Assert.assertTrue((event as OnCharacteristicRead).status == BluetoothGatt.STATE_DISCONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -236,12 +237,12 @@ class ReadCharacteristicQueueingTest {
           characteristic = mockBleCharacteristic2,
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnCharacteristicRead).gatt === mockBleGatt2) // Same instance
-          Assert.assertTrue((event as BleEvent.OnCharacteristicRead).characteristic === mockBleCharacteristic2) // Same instance
-          Assert.assertTrue((event as BleEvent.OnCharacteristicRead).status == BluetoothGatt.STATE_DISCONNECTED)
+          Assert.assertTrue((event as OnCharacteristicRead).gatt === mockBleGatt2) // Same instance
+          Assert.assertTrue((event as OnCharacteristicRead).characteristic === mockBleCharacteristic2) // Same instance
+          Assert.assertTrue((event as OnCharacteristicRead).status == BluetoothGatt.STATE_DISCONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(

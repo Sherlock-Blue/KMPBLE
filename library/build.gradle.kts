@@ -45,6 +45,7 @@ kotlin {
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test) // org.junit imports only work if this is in commonTest
+      implementation(libs.kotlinx.coroutines.core)
       implementation(libs.kotlinx.coroutines.test)
     }
     androidMain.dependencies {

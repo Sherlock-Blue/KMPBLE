@@ -3,8 +3,10 @@ package peripheral.coroutines
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCallback
@@ -22,7 +24,7 @@ class PeripheralConnectTest {
   // Connect
 
   @Test
-  fun `Connect returns OnConnectionStateChanged BleEvent`() =
+  fun `Connect returns ConnectionStateChanged BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -33,10 +35,10 @@ class PeripheralConnectTest {
           .build()
       val mockGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnConnectionStateChange(
+              OnConnectionStateChange(
                 gatt = mockGatt,
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
@@ -48,60 +50,20 @@ class PeripheralConnectTest {
       launch {
         // Prepare object under test
         val gattCallbackHandler = GattCallbackHandler(this)
-        gattCallbackHandler._eventBus = mockEventBus
+        gattCallbackHandler._nativeEventBus = mockEventBus
         val peripheral =
           Peripheral(device = mockDevice, coroutineScope = this, context = mockContext, gattCallbackHandler = gattCallbackHandler)
+        val eventBus = peripheral.eventBus()
 
         // Assert
-        Assert.assertTrue(peripheral.connect() is BleEvent.OnConnectionStateChange)
+        Assert.assertTrue(peripheral.connect() is BleResponse.ConnectionStateChange)
 
         this.cancel()
       }
     }
 
   @Test
-  fun `Connect saves the returned Gatt instance`() =
-    runTest {
-      // Arrange
-      // Mocked Fixtures
-      val mockContext: Context = mockk()
-      val mockDevice: BluetoothDevice =
-        MockBluetoothDevice.Builder()
-          .setCallbackHandler(mockk<GattCallbackHandler>(relaxed = true))
-          .build()
-      val mockGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
-          events =
-            listOf(
-              BleEvent.OnConnectionStateChange(
-                gatt = mockGatt,
-                status = BluetoothGatt.GATT_SUCCESS,
-                newState = BluetoothGatt.STATE_CONNECTED,
-              ),
-            ),
-          subscriptionCount = mockk<StateFlow<Int>>(),
-        )
-
-      launch {
-        // Prepare object under test
-        val gattCallbackHandler = GattCallbackHandler(this)
-        gattCallbackHandler._eventBus = mockEventBus
-        val peripheral =
-          Peripheral(device = mockDevice, coroutineScope = this, context = mockContext, gattCallbackHandler = gattCallbackHandler)
-
-        // Act
-        peripheral.connect()
-
-        // Assert
-        Assert.assertTrue(peripheral.gatt === mockGatt) // Same instance
-
-        this.cancel()
-      }
-    }
-
-  @Test
-  fun `Connect returns an OnConnectionStateChange BleEvent`() =
+  fun `Connect returns an ConnectionStateChange BleResponse`() =
     runTest {
       launch {
         // Arrange
@@ -111,7 +73,7 @@ class PeripheralConnectTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnConnectionStateChange(
+              OnConnectionStateChange(
                 gatt = mockGatt,
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
@@ -133,7 +95,7 @@ class PeripheralConnectTest {
           )
 
         // Assert
-        Assert.assertTrue(peripheral.connect() is BleEvent.OnConnectionStateChange)
+        Assert.assertTrue(peripheral.connect() is BleResponse.ConnectionStateChange)
 
         this.cancel()
       }

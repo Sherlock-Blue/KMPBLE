@@ -2,8 +2,9 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
@@ -27,7 +28,7 @@ class ConnectQueueingTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnConnectionStateChange(
+              OnConnectionStateChange(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
@@ -60,10 +61,10 @@ class ConnectQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnConnectionStateChange(
+              OnConnectionStateChange(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
@@ -79,7 +80,7 @@ class ConnectQueueingTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnConnectionStateChange(
+              OnConnectionStateChange(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
@@ -110,13 +111,13 @@ class ConnectQueueingTest {
         // Arrange
         // Mocked Fixtures
         val mockBleEvent =
-          BleEvent.OnConnectionStateChange(
+          OnConnectionStateChange(
             gatt = MockBluetoothGatt.Builder().build(),
             status = BluetoothGatt.GATT_SUCCESS,
             newState = BluetoothGatt.STATE_CONNECTED,
           )
         val mockEventBus =
-          MockMutableSharedFlow<BleEvent>(
+          MockMutableSharedFlow<NativeBleEvent>(
             events =
               listOf(mockBleEvent),
             subscriptionCount = mockk<StateFlow<Int>>(),
@@ -125,7 +126,7 @@ class ConnectQueueingTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnConnectionStateChange(
+              OnConnectionStateChange(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
                 newState = BluetoothGatt.STATE_CONNECTED,
@@ -200,7 +201,7 @@ class ConnectQueueingTest {
           gattCallbackHandler = gattCallbackHandler,
         ) { event ->
           // Assert
-          Assert.assertTrue(event is BleEvent.OnConnectionStateChange)
+          Assert.assertTrue(event is OnConnectionStateChange)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -237,9 +238,9 @@ class ConnectQueueingTest {
           gattCallbackHandler = gattCallbackHandler,
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnConnectionStateChange).gatt === mockBleGatt1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnConnectionStateChange).status == BluetoothGatt.GATT_SUCCESS)
-          Assert.assertTrue((event as BleEvent.OnConnectionStateChange).newState == BluetoothGatt.STATE_CONNECTED)
+          Assert.assertTrue((event as OnConnectionStateChange).gatt === mockBleGatt1) // Same instance
+          Assert.assertTrue((event as OnConnectionStateChange).status == BluetoothGatt.GATT_SUCCESS)
+          Assert.assertTrue((event as OnConnectionStateChange).newState == BluetoothGatt.STATE_CONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(

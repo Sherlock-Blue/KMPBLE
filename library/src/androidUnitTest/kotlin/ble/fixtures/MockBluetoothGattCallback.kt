@@ -3,9 +3,21 @@ package com.sherlockblue.kmpble.ble.fixtures
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent.OnConnectionStateChange
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicChanged
+import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicRead
+import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicWrite
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
+import com.sherlockblue.kmpble.ble.callbacks.OnDescriptorRead
+import com.sherlockblue.kmpble.ble.callbacks.OnDescriptorWrite
+import com.sherlockblue.kmpble.ble.callbacks.OnMtuChanged
+import com.sherlockblue.kmpble.ble.callbacks.OnPhyRead
+import com.sherlockblue.kmpble.ble.callbacks.OnPhyUpdate
+import com.sherlockblue.kmpble.ble.callbacks.OnReadRemoteRssi
+import com.sherlockblue.kmpble.ble.callbacks.OnReliableWriteCompleted
+import com.sherlockblue.kmpble.ble.callbacks.OnServiceChanged
+import com.sherlockblue.kmpble.ble.callbacks.OnServicesDiscovered
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
@@ -16,10 +28,10 @@ import kotlinx.coroutines.launch
 class MockBluetoothGattCallback {
   class Builder() {
     private var coroutineScope: CoroutineScope? = null
-    private val callbackEvents = mutableMapOf<String, BleEvent>()
-    private var mockEventBus: MutableSharedFlow<BleEvent>? = null
+    private val callbackEvents = mutableMapOf<String, NativeBleEvent>()
+    private var mockEventBus: MutableSharedFlow<NativeBleEvent>? = null
 
-    fun setCallbackResponse(newEvent: BleEvent): Builder {
+    fun setCallbackResponse(newEvent: NativeBleEvent): Builder {
       this.callbackEvents[newEvent.javaClass.simpleName] = newEvent
       return this
     }
@@ -29,20 +41,20 @@ class MockBluetoothGattCallback {
       return this
     }
 
-    fun setEventBus(newEventBus: MutableSharedFlow<BleEvent>): Builder {
+    fun setEventBus(newEventBus: MutableSharedFlow<NativeBleEvent>): Builder {
       this.mockEventBus = newEventBus
       return this
     }
 
     fun build(): GattCallbackHandler =
       mockk<GattCallbackHandler>().apply {
-        val _mockEventBus = mockEventBus ?: MutableSharedFlow<BleEvent>()
+        val _mockEventBus = mockEventBus ?: MutableSharedFlow<NativeBleEvent>()
 
-        every { eventBus() } answers {
-          _mockEventBus as SharedFlow<BleEvent>
+        every { nativeEventBus() } answers {
+          _mockEventBus as SharedFlow<NativeBleEvent>
         }
 
-        fun publishMockEvent(bleEvent: BleEvent) {
+        fun publishMockEvent(bleEvent: NativeBleEvent) {
           coroutineScope!!.launch {
             _mockEventBus.emit(bleEvent)
           }
@@ -50,7 +62,7 @@ class MockBluetoothGattCallback {
 
         every { onConnectionStateChange(any<BluetoothGatt>(), any<Int>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnConnectionStateChange::class.simpleName] ?: OnConnectionStateChange(
+            callbackEvents[OnConnectionStateChange::class.simpleName] ?: OnConnectionStateChange(
               gatt = firstArg<BluetoothGatt>(),
               status = secondArg<Int>(),
               newState = thirdArg<Int>(),
@@ -60,7 +72,7 @@ class MockBluetoothGattCallback {
 
         every { onServicesDiscovered(any<BluetoothGatt>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnServicesDiscovered::class.simpleName] ?: BleEvent.OnServicesDiscovered(
+            callbackEvents[OnServicesDiscovered::class.simpleName] ?: OnServicesDiscovered(
               gatt = firstArg<BluetoothGatt>(),
               status = secondArg<Int>(),
             ),
@@ -69,7 +81,7 @@ class MockBluetoothGattCallback {
 
         every { onMtuChanged(any<BluetoothGatt>(), any<Int>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnMtuChanged::class.simpleName] ?: BleEvent.OnMtuChanged(
+            callbackEvents[OnMtuChanged::class.simpleName] ?: OnMtuChanged(
               gatt = firstArg<BluetoothGatt>(),
               mtu = secondArg<Int>(),
               status = thirdArg<Int>(),
@@ -79,7 +91,7 @@ class MockBluetoothGattCallback {
 
         every { onCharacteristicWrite(any<BluetoothGatt>(), any<BluetoothGattCharacteristic>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnCharacteristicWrite::class.simpleName] ?: BleEvent.OnCharacteristicWrite(
+            callbackEvents[OnCharacteristicWrite::class.simpleName] ?: OnCharacteristicWrite(
               gatt = firstArg<BluetoothGatt>(),
               characteristic = secondArg<BluetoothGattCharacteristic>(),
               status = thirdArg<Int>(),
@@ -89,7 +101,7 @@ class MockBluetoothGattCallback {
 
         every { onCharacteristicRead(any<BluetoothGatt>(), any<BluetoothGattCharacteristic>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnCharacteristicRead::class.simpleName] ?: BleEvent.OnCharacteristicRead(
+            callbackEvents[OnCharacteristicRead::class.simpleName] ?: OnCharacteristicRead(
               gatt = firstArg<BluetoothGatt>(),
               characteristic = secondArg<BluetoothGattCharacteristic>(),
               value = secondArg<BluetoothGattCharacteristic>().value,
@@ -100,7 +112,7 @@ class MockBluetoothGattCallback {
 
         every { onCharacteristicRead(any<BluetoothGatt>(), any<BluetoothGattCharacteristic>(), any<ByteArray>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnCharacteristicRead::class.simpleName] ?: BleEvent.OnCharacteristicRead(
+            callbackEvents[OnCharacteristicRead::class.simpleName] ?: OnCharacteristicRead(
               gatt = firstArg<BluetoothGatt>(),
               characteristic = secondArg<BluetoothGattCharacteristic>(),
               value = thirdArg<ByteArray>(),
@@ -111,7 +123,7 @@ class MockBluetoothGattCallback {
 
         every { onCharacteristicChanged(any<BluetoothGatt>(), any<BluetoothGattCharacteristic>(), any<ByteArray>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnCharacteristicChanged::class.simpleName] ?: BleEvent.OnCharacteristicChanged(
+            callbackEvents[OnCharacteristicChanged::class.simpleName] ?: OnCharacteristicChanged(
               gatt = firstArg<BluetoothGatt>(),
               characteristic = secondArg<BluetoothGattCharacteristic>(),
               value = thirdArg<ByteArray>(),
@@ -121,7 +133,7 @@ class MockBluetoothGattCallback {
 
         every { onCharacteristicChanged(any<BluetoothGatt>(), any<BluetoothGattCharacteristic>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnCharacteristicChanged::class.simpleName] ?: BleEvent.OnCharacteristicChanged(
+            callbackEvents[OnCharacteristicChanged::class.simpleName] ?: OnCharacteristicChanged(
               gatt = firstArg<BluetoothGatt>(),
               characteristic = secondArg<BluetoothGattCharacteristic>(),
               value = secondArg<BluetoothGattCharacteristic>().value,
@@ -131,7 +143,7 @@ class MockBluetoothGattCallback {
 
         every { onCharacteristicRead(any<BluetoothGatt>(), any<BluetoothGattCharacteristic>(), any<ByteArray>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnCharacteristicRead::class.simpleName] ?: BleEvent.OnCharacteristicRead(
+            callbackEvents[OnCharacteristicRead::class.simpleName] ?: OnCharacteristicRead(
               gatt = firstArg<BluetoothGatt>(),
               characteristic = secondArg<BluetoothGattCharacteristic>(),
               value = thirdArg<ByteArray>(),
@@ -142,7 +154,7 @@ class MockBluetoothGattCallback {
 
         every { onDescriptorRead(any<BluetoothGatt>(), any<BluetoothGattDescriptor>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnDescriptorRead::class.simpleName] ?: BleEvent.OnDescriptorRead(
+            callbackEvents[OnDescriptorRead::class.simpleName] ?: OnDescriptorRead(
               gatt = firstArg<BluetoothGatt>(),
               descriptor = secondArg<BluetoothGattDescriptor>(),
               value = secondArg<BluetoothGattDescriptor>().value,
@@ -153,7 +165,7 @@ class MockBluetoothGattCallback {
 
         every { onDescriptorRead(any<BluetoothGatt>(), any<BluetoothGattDescriptor>(), any<Int>(), any<ByteArray>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnDescriptorRead::class.simpleName] ?: BleEvent.OnDescriptorRead(
+            callbackEvents[OnDescriptorRead::class.simpleName] ?: OnDescriptorRead(
               gatt = firstArg<BluetoothGatt>(),
               descriptor = secondArg<BluetoothGattDescriptor>(),
               status = thirdArg<Int>(),
@@ -164,7 +176,7 @@ class MockBluetoothGattCallback {
 
         every { onDescriptorWrite(any<BluetoothGatt>(), any<BluetoothGattDescriptor>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnDescriptorWrite::class.simpleName] ?: BleEvent.OnDescriptorWrite(
+            callbackEvents[OnDescriptorWrite::class.simpleName] ?: OnDescriptorWrite(
               gatt = firstArg<BluetoothGatt>(),
               descriptor = secondArg<BluetoothGattDescriptor>(),
               status = thirdArg<Int>(),
@@ -174,7 +186,7 @@ class MockBluetoothGattCallback {
 
         every { onReadRemoteRssi(any<BluetoothGatt>(), any<Int>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnReadRemoteRssi::class.simpleName] ?: BleEvent.OnReadRemoteRssi(
+            callbackEvents[OnReadRemoteRssi::class.simpleName] ?: OnReadRemoteRssi(
               gatt = firstArg<BluetoothGatt>(),
               rssi = secondArg<Int>(),
               status = thirdArg<Int>(),
@@ -184,7 +196,7 @@ class MockBluetoothGattCallback {
 
         every { onReliableWriteCompleted(any<BluetoothGatt>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnReliableWriteCompleted::class.simpleName] ?: BleEvent.OnReliableWriteCompleted(
+            callbackEvents[OnReliableWriteCompleted::class.simpleName] ?: OnReliableWriteCompleted(
               gatt = firstArg<BluetoothGatt>(),
               status = secondArg<Int>(),
             ),
@@ -193,7 +205,7 @@ class MockBluetoothGattCallback {
 
         every { onPhyRead(any<BluetoothGatt>(), any<Int>(), any<Int>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnPhyRead::class.simpleName] ?: BleEvent.OnPhyRead(
+            callbackEvents[OnPhyRead::class.simpleName] ?: OnPhyRead(
               gatt = firstArg<BluetoothGatt>(),
               txPhy = secondArg<Int>(),
               rxPhy = thirdArg<Int>(),
@@ -204,7 +216,7 @@ class MockBluetoothGattCallback {
 
         every { onPhyUpdate(any<BluetoothGatt>(), any<Int>(), any<Int>(), any<Int>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnPhyUpdate::class.simpleName] ?: BleEvent.OnPhyUpdate(
+            callbackEvents[OnPhyUpdate::class.simpleName] ?: OnPhyUpdate(
               gatt = firstArg<BluetoothGatt>(),
               txPhy = secondArg<Int>(),
               rxPhy = thirdArg<Int>(),
@@ -215,7 +227,7 @@ class MockBluetoothGattCallback {
 
         every { onServiceChanged(any<BluetoothGatt>()) } answers {
           publishMockEvent(
-            callbackEvents[BleEvent.OnServiceChanged::class.simpleName] ?: BleEvent.OnServiceChanged(
+            callbackEvents[OnServiceChanged::class.simpleName] ?: OnServiceChanged(
               gatt = firstArg<BluetoothGatt>(),
             ),
           )

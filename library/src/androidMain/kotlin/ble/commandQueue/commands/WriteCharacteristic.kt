@@ -4,7 +4,8 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.os.Build
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
+import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicWrite
 import com.sherlockblue.kmpble.ble.commandQueue.BleQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -18,7 +19,7 @@ class WriteCharacteristic(
   private val data: ByteArray,
   private val bleQueue: BleQueue,
   private val coroutineScope: CoroutineScope,
-  private val gattCallbackEventBus: SharedFlow<BleEvent>,
+  private val gattCallbackEventBus: SharedFlow<NativeBleEvent>,
   private val osVersion: Int = Build.VERSION.SDK_INT,
   private val commandCallback: CommandCallback,
 ) : BleCommand(bleQueue = bleQueue) {
@@ -29,7 +30,7 @@ class WriteCharacteristic(
   override fun execute() {
     coroutineScope.launch {
       gattCallbackEventBus.collect { bleEvent ->
-        if ((bleEvent is BleEvent.OnCharacteristicWrite) && (
+        if ((bleEvent is OnCharacteristicWrite) && (
             bleEvent.characteristic.uuid!! == characteristic.uuid
           )
         ) {

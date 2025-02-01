@@ -3,8 +3,10 @@ package peripheral.coroutines
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnDescriptorWrite
 import com.sherlockblue.kmpble.ble.fixtures.DEFAULT_UUID
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
@@ -26,7 +28,7 @@ class PeripheralWriteDescriptorTest {
   // writeDescriptor
 
   @Test
-  fun `WriteDescriptor with null Gatt returns CallbackError BleEvent`() =
+  fun `WriteDescriptor with null Gatt returns CallbackError BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -49,7 +51,7 @@ class PeripheralWriteDescriptorTest {
             characteristicUUID = DEFAULT_UUID,
             descriptorUUID = DEFAULT_UUID,
             data = byteArrayOf(),
-          ) is BleEvent.CallbackError,
+          ) is BleResponse.Error,
         )
 
         this.cancel()
@@ -57,7 +59,7 @@ class PeripheralWriteDescriptorTest {
     }
 
   @Test
-  fun `WriteDescriptor with invalid Descriptor UUID returns CallbackError BleEvent`() =
+  fun `WriteDescriptor with invalid Descriptor UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -95,7 +97,7 @@ class PeripheralWriteDescriptorTest {
             characteristicUUID = DEFAULT_UUID,
             descriptorUUID = "INVALID UUID",
             data = byteArrayOf(),
-          ) is BleEvent.CallbackError,
+          ) is BleResponse.Error,
         )
 
         this.cancel()
@@ -103,7 +105,7 @@ class PeripheralWriteDescriptorTest {
     }
 
   @Test
-  fun `WriteDescriptor with invalid Characteristic UUID returns CallbackError BleEvent`() =
+  fun `WriteDescriptor with invalid Characteristic UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -141,7 +143,7 @@ class PeripheralWriteDescriptorTest {
             characteristicUUID = "INVALID UUID",
             descriptorUUID = DEFAULT_UUID,
             data = byteArrayOf(),
-          ) is BleEvent.CallbackError,
+          ) is BleResponse.Error,
         )
 
         this.cancel()
@@ -149,7 +151,7 @@ class PeripheralWriteDescriptorTest {
     }
 
   @Test
-  fun `WriteDescriptor returns OnDescriptorWrite BleEvent`() =
+  fun `WriteDescriptor returns DescriptorWrite BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -169,10 +171,10 @@ class PeripheralWriteDescriptorTest {
           .setServices(listOf(mockService))
           .build()
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnDescriptorWrite(
+              OnDescriptorWrite(
                 gatt = mockGatt,
                 descriptor = mockDescriptor,
                 status = BluetoothGatt.GATT_SUCCESS,
@@ -184,7 +186,7 @@ class PeripheralWriteDescriptorTest {
       launch {
         // Prepare object under test
         val gattCallbackHandler = GattCallbackHandler(this)
-        gattCallbackHandler._eventBus = mockEventBus
+        gattCallbackHandler._nativeEventBus = mockEventBus
         val peripheral =
           Peripheral(
             device = mockDevice,
@@ -201,7 +203,7 @@ class PeripheralWriteDescriptorTest {
             characteristicUUID = DEFAULT_UUID,
             descriptorUUID = DEFAULT_UUID,
             data = byteArrayOf(),
-          ) is BleEvent.OnDescriptorWrite,
+          ) is BleResponse.DescriptorWrite,
         )
 
         this.cancel()
@@ -209,7 +211,7 @@ class PeripheralWriteDescriptorTest {
     }
 
   @Test
-  fun `WriteDescriptor returns an OnDescriptorWrite BleEvent`() =
+  fun `WriteDescriptor returns an DescriptorWrite BleResponse`() =
     runTest {
       launch {
         // Arrange
@@ -224,7 +226,7 @@ class PeripheralWriteDescriptorTest {
             .setCharacteristics(listOf(mockCharacteristic))
             .build()
         val mockBleEvent =
-          BleEvent.OnDescriptorWrite(
+          OnDescriptorWrite(
             gatt = mockk<BluetoothGatt>(relaxed = true),
             descriptor = mockDescriptor,
             status = BluetoothGatt.GATT_SUCCESS,
@@ -257,7 +259,7 @@ class PeripheralWriteDescriptorTest {
           }
 
         // Assert
-        Assert.assertTrue(peripheral.writeDescriptor(DEFAULT_UUID, DEFAULT_UUID, byteArrayOf()) is BleEvent.OnDescriptorWrite)
+        Assert.assertTrue(peripheral.writeDescriptor(DEFAULT_UUID, DEFAULT_UUID, byteArrayOf()) is BleResponse.DescriptorWrite)
 
         this.cancel()
       }

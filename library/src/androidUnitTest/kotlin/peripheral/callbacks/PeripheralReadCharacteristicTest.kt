@@ -3,8 +3,10 @@ package peripheral.callbacks
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicRead
 import com.sherlockblue.kmpble.ble.fixtures.DEFAULT_UUID
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
@@ -25,7 +27,7 @@ class PeripheralReadCharacteristicTest {
   // readCharacteristic
 
   @Test
-  fun `ReadCharacteristic with null Gatt returns CallbackError BleEvent`() =
+  fun `ReadCharacteristic with null Gatt returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -45,14 +47,14 @@ class PeripheralReadCharacteristicTest {
         // Act
         peripheral.readCharacteristic(DEFAULT_UUID) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadCharacteristic with invalid UUID returns CallbackError BleEvent`() =
+  fun `ReadCharacteristic with invalid UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -72,14 +74,14 @@ class PeripheralReadCharacteristicTest {
         // Act
         peripheral.readCharacteristic("INVALID UUID") { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadCharacteristic returns OnCharacteristicRead BleEvent`() =
+  fun `ReadCharacteristic returns CharacteristicRead BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -99,10 +101,10 @@ class PeripheralReadCharacteristicTest {
           .setServices(listOf(mockService))
           .build()
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnCharacteristicRead(
+              OnCharacteristicRead(
                 gatt = mockGatt,
                 characteristic = mockCharacteristic2,
                 value = byteArrayOf(),
@@ -115,7 +117,7 @@ class PeripheralReadCharacteristicTest {
       launch {
         // Prepare object under test
         val gattCallbackHandler = GattCallbackHandler(this)
-        gattCallbackHandler._eventBus = mockEventBus
+        gattCallbackHandler._nativeEventBus = mockEventBus
         val peripheral =
           Peripheral(
             device = mockDevice,
@@ -129,14 +131,14 @@ class PeripheralReadCharacteristicTest {
         // Act
         peripheral.readCharacteristic(DEFAULT_UUID) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.OnCharacteristicRead)
+          Assert.assertTrue(bleEvent is BleResponse.CharacteristicRead)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadCharacteristic with Incorrect UUID returns ErrorCallback BleEvent`() =
+  fun `ReadCharacteristic with Incorrect UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -170,14 +172,14 @@ class PeripheralReadCharacteristicTest {
         // Act
         peripheral.readCharacteristic("INVALID UUID") { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadCharacteristic with Invalid UUID returns ErrorCallback BleEvent`() =
+  fun `ReadCharacteristic with Invalid UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -208,14 +210,14 @@ class PeripheralReadCharacteristicTest {
         // Act
         peripheral.readCharacteristic("INVALID UUID") { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadCharacteristic returns an OnCharacteristicRead BleEvent`() =
+  fun `ReadCharacteristic returns an CharacteristicRead BleResponse`() =
     runTest {
       launch {
         // Arrange
@@ -229,7 +231,7 @@ class PeripheralReadCharacteristicTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnCharacteristicRead(
+              OnCharacteristicRead(
                 gatt = MockBluetoothGatt.Builder().build(),
                 characteristic = mockCharacteristic,
                 value = byteArrayOf(),
@@ -263,7 +265,7 @@ class PeripheralReadCharacteristicTest {
         // Act
         peripheral.readCharacteristic(DEFAULT_UUID) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.OnCharacteristicRead)
+          Assert.assertTrue(bleEvent is BleResponse.CharacteristicRead)
           this.cancel()
         }
       }

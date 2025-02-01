@@ -1,5 +1,7 @@
 package com.sherlockblue.kmpble.callbacks
 
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -11,14 +13,22 @@ import platform.Foundation.NSError
 import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 
+typealias PeripheralState = Boolean
+
 class CentralManagerCallbacks(private val coroutineScope: CoroutineScope) : NSObject(), CBCentralManagerDelegateProtocol {
-  private var _eventBus = MutableSharedFlow<BleEvent>()
+  private var _nativeEventBus = MutableSharedFlow<NativeBleEvent>()
 
-  fun eventBus() = _eventBus as SharedFlow<BleEvent>
+  fun nativeEventBus() = _nativeEventBus as SharedFlow<NativeBleEvent>
 
-  private fun publishEvent(event: BleEvent) {
+  private var _eventBus = MutableSharedFlow<BleResponse>()
+
+  fun eventBus() = _eventBus as SharedFlow<BleResponse>
+
+  private fun publishEvent(event: NativeBleEvent) {
     coroutineScope.launch {
-      _eventBus.emit(event)
+      _nativeEventBus.emit(event)
+      _nativeEventBus.emit(event)
+      event.toBleResponse().let { bleResponse -> _eventBus.emit(bleResponse) }
     }
   }
 
@@ -29,7 +39,7 @@ class CentralManagerCallbacks(private val coroutineScope: CoroutineScope) : NSOb
     RSSI: NSNumber,
   ) {
     publishEvent(
-      BleEvent.OnPeripheralDiscovered(
+      OnPeripheralDiscovered(
         central = central,
         peripheral = didDiscoverPeripheral,
         advertisementData = advertisementData,
@@ -43,7 +53,7 @@ class CentralManagerCallbacks(private val coroutineScope: CoroutineScope) : NSOb
     didConnectPeripheral: CBPeripheral,
   ) {
     publishEvent(
-      BleEvent.OnPeripheralConnect(
+      OnPeripheralConnect(
         central = central,
         peripheral = didConnectPeripheral,
       ),
@@ -56,7 +66,7 @@ class CentralManagerCallbacks(private val coroutineScope: CoroutineScope) : NSOb
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnPeripheralDisconnect(
+      OnPeripheralDisconnect(
         central = central,
         peripheral = didDisconnectPeripheral,
       ),
@@ -64,6 +74,6 @@ class CentralManagerCallbacks(private val coroutineScope: CoroutineScope) : NSOb
   }
 
   override fun centralManagerDidUpdateState(central: CBCentralManager) {
-    publishEvent(BleEvent.OnServiceChanged(central = central))
+    publishEvent(OnServiceChanged(central = central))
   }
 }

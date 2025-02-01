@@ -1,8 +1,9 @@
 package com.sherlockblue.kmpble.ble.commandQueue.commands
 
 import android.bluetooth.BluetoothGatt
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCallback
@@ -29,7 +30,7 @@ class DisconnectQueueingTest {
             gatt = mockk<BluetoothGatt>(relaxed = true),
             bleQueue = commandQueue,
             coroutineScope = this,
-            gattCallbackEventBus = GattCallbackHandler(this).eventBus(),
+            gattCallbackEventBus = GattCallbackHandler(this).nativeEventBus(),
           ) { }
 
         // Assert
@@ -45,13 +46,13 @@ class DisconnectQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockBleEvent =
-        BleEvent.OnConnectionStateChange(
+        OnConnectionStateChange(
           gatt = MockBluetoothGatt.Builder().build(),
           status = BluetoothGatt.GATT_SUCCESS,
           newState = BluetoothGatt.STATE_DISCONNECTED,
         )
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(mockBleEvent),
           subscriptionCount = mockk<StateFlow<Int>>(),
@@ -60,7 +61,7 @@ class DisconnectQueueingTest {
         MockBluetoothGattCallback.Builder()
           .setCoroutineScope(this)
           .setCallbackResponse(
-            BleEvent.OnConnectionStateChange(
+            OnConnectionStateChange(
               gatt = MockBluetoothGatt.Builder().build(),
               status = BluetoothGatt.GATT_SUCCESS,
               newState = BluetoothGatt.STATE_CONNECTED,
@@ -76,7 +77,7 @@ class DisconnectQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = mockGattCallbackHandler.eventBus(),
+          gattCallbackEventBus = mockGattCallbackHandler.nativeEventBus(),
         ) { }
       }.join()
 
@@ -90,13 +91,13 @@ class DisconnectQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockBleEvent =
-        BleEvent.OnConnectionStateChange(
+        OnConnectionStateChange(
           gatt = MockBluetoothGatt.Builder().build(),
           status = BluetoothGatt.GATT_SUCCESS,
           newState = BluetoothGatt.STATE_DISCONNECTED,
         )
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(mockBleEvent),
           subscriptionCount = mockk<StateFlow<Int>>(),
@@ -105,7 +106,7 @@ class DisconnectQueueingTest {
         MockBluetoothGattCallback.Builder()
           .setCoroutineScope(this)
           .setCallbackResponse(
-            BleEvent.OnConnectionStateChange(
+            OnConnectionStateChange(
               gatt = MockBluetoothGatt.Builder().build(),
               status = BluetoothGatt.GATT_SUCCESS,
               newState = BluetoothGatt.STATE_CONNECTED,
@@ -122,7 +123,7 @@ class DisconnectQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = mockGattCallbackHandler.eventBus(),
+          gattCallbackEventBus = mockGattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
           Assert.assertTrue(event === mockBleEvent) // Same instance
@@ -143,7 +144,7 @@ class DisconnectQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { }
 
         gattCallbackHandler.onConnectionStateChange(
@@ -167,10 +168,10 @@ class DisconnectQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue(event is BleEvent.OnConnectionStateChange)
+          Assert.assertTrue(event is OnConnectionStateChange)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -200,12 +201,12 @@ class DisconnectQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnConnectionStateChange).gatt === mockBleGatt1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnConnectionStateChange).status == BluetoothGatt.GATT_SUCCESS)
-          Assert.assertTrue((event as BleEvent.OnConnectionStateChange).newState == BluetoothGatt.STATE_CONNECTED)
+          Assert.assertTrue((event as OnConnectionStateChange).gatt === mockBleGatt1) // Same instance
+          Assert.assertTrue((event as OnConnectionStateChange).status == BluetoothGatt.GATT_SUCCESS)
+          Assert.assertTrue((event as OnConnectionStateChange).newState == BluetoothGatt.STATE_CONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(

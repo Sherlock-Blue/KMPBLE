@@ -14,7 +14,7 @@ class MockBluetoothGatt {
   class Builder() {
     private var mockDevice: BluetoothDevice = MockBluetoothDevice.Builder().build()
     private var mockCallbackHandler: BluetoothGattCallback = mockk(relaxed = true)
-    private var mockServices: List<BluetoothGattService> = listOf()
+    private var mockServices: List<BluetoothGattService>? = listOf()
 
     fun setDevice(newDevice: BluetoothDevice): Builder {
       this.mockDevice = newDevice
@@ -26,7 +26,7 @@ class MockBluetoothGatt {
       return this
     }
 
-    fun setServices(characteristics: List<BluetoothGattService>): Builder {
+    fun setServices(characteristics: List<BluetoothGattService>?): Builder {
       this.mockServices = characteristics
       return this
     }
@@ -40,7 +40,7 @@ class MockBluetoothGatt {
 
         every { getService(any<UUID>()) } answers {
           val uuid = firstArg<UUID>()
-          mockServices.firstOrNull { it.uuid.equals(uuid) }
+          mockServices!!.firstOrNull { it.uuid.equals(uuid) }
         }
 
         every { disconnect() } answers {

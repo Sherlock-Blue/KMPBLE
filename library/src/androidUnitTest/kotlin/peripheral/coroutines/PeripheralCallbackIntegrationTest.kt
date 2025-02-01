@@ -3,8 +3,8 @@ package peripheral.coroutines
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.peripheral.Peripheral
 import io.mockk.mockk
@@ -40,7 +40,7 @@ class PeripheralCallbackIntegrationTest {
         )
 
         // Assert
-        Assert.assertTrue(peripheral.eventBus().first() is BleEvent.OnConnectionStateChange)
+        Assert.assertTrue(peripheral.nativeEventBus().first() is OnConnectionStateChange)
 
         this.cancel()
       }

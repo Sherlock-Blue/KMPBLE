@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Test
 
-class GattCallbackHandlerTest {
+class NativeEventsTest {
   // onConnectionStateChange
 
   @Test
@@ -20,7 +20,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockNewState = BluetoothGatt.STATE_CONNECTED
 
       // Prepare object under test
@@ -30,7 +30,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onConnectionStateChange(mockBleGatt, mockStatus, mockNewState)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnConnectionStateChange)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnConnectionStateChange)
     }
 
   @Test
@@ -39,7 +39,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockNewState = BluetoothGatt.STATE_CONNECTED
 
       // Prepare object under test
@@ -50,7 +50,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnConnectionStateChange).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnConnectionStateChange).gatt === mockBleGatt,
       )
     }
 
@@ -60,7 +60,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = Int.MAX_VALUE
+      val mockStatus = TEST_STATUS
       val mockNewState = BluetoothGatt.STATE_CONNECTED
 
       // Prepare object under test
@@ -71,7 +71,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnConnectionStateChange).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnConnectionStateChange).status == mockStatus,
       )
     }
 
@@ -81,7 +81,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockNewState = Int.MAX_VALUE
 
       // Prepare object under test
@@ -92,7 +92,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnConnectionStateChange).newState == mockNewState,
+        (gattCallbackHandler.nativeEventBus().first() as OnConnectionStateChange).newState == mockNewState,
       )
     }
 
@@ -112,7 +112,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onServiceChanged(mockBleGatt)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnServiceChanged)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnServiceChanged)
     }
 
   @Test
@@ -130,7 +130,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnServiceChanged).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnServiceChanged).gatt === mockBleGatt,
       )
     }
 
@@ -142,7 +142,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockMtu = Int.MAX_VALUE
 
       // Prepare object under test
@@ -152,7 +152,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onMtuChanged(mockBleGatt, mockMtu, mockStatus)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnMtuChanged)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnMtuChanged)
     }
 
   @Test
@@ -161,7 +161,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockMtu = DEFAULT_MTU_SIZE
 
       // Prepare object under test
@@ -172,7 +172,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnMtuChanged).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnMtuChanged).gatt === mockBleGatt,
       )
     }
 
@@ -182,7 +182,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockMtu = Int.MAX_VALUE
 
       // Prepare object under test
@@ -193,7 +193,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnMtuChanged).mtu == mockMtu,
+        (gattCallbackHandler.nativeEventBus().first() as OnMtuChanged).mtu == mockMtu,
       )
     }
 
@@ -203,7 +203,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = Int.MAX_VALUE
+      val mockStatus = TEST_STATUS
       val mockMtu = DEFAULT_MTU_SIZE
 
       // Prepare object under test
@@ -214,7 +214,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnMtuChanged).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnMtuChanged).status == mockStatus,
       )
     }
 
@@ -227,7 +227,7 @@ class GattCallbackHandlerTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockRSSI = TEST_RSSI
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -236,7 +236,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onReadRemoteRssi(mockBleGatt, mockRSSI, mockStatus)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnReadRemoteRssi)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnReadRemoteRssi)
     }
 
   @Test
@@ -246,7 +246,7 @@ class GattCallbackHandlerTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockRSSI = TEST_RSSI
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -256,7 +256,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnReadRemoteRssi).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnReadRemoteRssi).gatt === mockBleGatt,
       )
     }
 
@@ -267,7 +267,7 @@ class GattCallbackHandlerTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockRSSI = TEST_RSSI
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -277,7 +277,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnReadRemoteRssi).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnReadRemoteRssi).status == mockStatus,
       )
     }
 
@@ -288,7 +288,7 @@ class GattCallbackHandlerTest {
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockRSSI = TEST_RSSI
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -298,7 +298,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnReadRemoteRssi).rssi == mockRSSI,
+        (gattCallbackHandler.nativeEventBus().first() as OnReadRemoteRssi).rssi == mockRSSI,
       )
     }
 
@@ -310,7 +310,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -319,7 +319,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onReliableWriteCompleted(mockBleGatt, mockStatus)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnReliableWriteCompleted)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnReliableWriteCompleted)
     }
 
   @Test
@@ -328,7 +328,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -336,7 +336,7 @@ class GattCallbackHandlerTest {
       // Act
       gattCallbackHandler.onReliableWriteCompleted(mockBleGatt, mockStatus)
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnReliableWriteCompleted).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnReliableWriteCompleted).gatt === mockBleGatt,
       )
     }
 
@@ -346,7 +346,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = Int.MAX_VALUE
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -354,7 +354,7 @@ class GattCallbackHandlerTest {
       // Act
       gattCallbackHandler.onReliableWriteCompleted(mockBleGatt, mockStatus)
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnReliableWriteCompleted).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnReliableWriteCompleted).status == mockStatus,
       )
     }
 
@@ -366,7 +366,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -375,7 +375,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onServicesDiscovered(mockBleGatt, mockStatus)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnServicesDiscovered)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnServicesDiscovered)
     }
 
   @Test
@@ -384,7 +384,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -394,7 +394,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnServicesDiscovered).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnServicesDiscovered).gatt === mockBleGatt,
       )
     }
 
@@ -404,7 +404,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = Int.MAX_VALUE
+      val mockStatus = TEST_STATUS
 
       // Prepare object under test
       val gattCallbackHandler = GattCallbackHandler(this)
@@ -414,7 +414,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnServicesDiscovered).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnServicesDiscovered).status == mockStatus,
       )
     }
 
@@ -426,7 +426,7 @@ class GattCallbackHandlerTest {
       // Arrange
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
+      val mockStatus = TEST_STATUS
       val mockTx = Int.MAX_VALUE
       val mockRx = Int.MIN_VALUE
 
@@ -437,36 +437,13 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onPhyRead(mockBleGatt, mockTx, mockRx, mockStatus)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnPhyRead)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnPhyRead)
     }
 
   @Test
   fun `onPhyRead callback emits an OnPhyRead BleEvent with same Gatt instance`() =
     runTest {
       // Arrange
-      // Mocked Fixtures
-      val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
-      val mockStatus = BluetoothGatt.GATT_SUCCESS
-      val mockTx = Int.MAX_VALUE
-      val mockRx = Int.MIN_VALUE
-
-      // Prepare object under test
-      val gattCallbackHandler = GattCallbackHandler(this)
-
-      // Act
-      gattCallbackHandler.onPhyRead(mockBleGatt, mockTx, mockRx, mockStatus)
-
-      // Assert
-      Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyRead).gatt === mockBleGatt,
-      )
-    }
-
-  @Test
-  fun `onPhyRead callback emits an OnPhyRead BleEvent with correct status`() =
-    runTest {
-      // Arrange
-      // Mocked Fixtures
       // Mocked Fixtures
       val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
       val mockStatus = TEST_STATUS
@@ -481,7 +458,29 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyRead).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyRead).gatt === mockBleGatt,
+      )
+    }
+
+  @Test
+  fun `onPhyRead callback emits an OnPhyRead BleEvent with correct status`() =
+    runTest {
+      // Arrange
+      // Mocked Fixtures
+      val mockBleGatt: BluetoothGatt = MockBluetoothGatt.Builder().build()
+      val mockStatus = TEST_STATUS
+      val mockTx = Int.MAX_VALUE
+      val mockRx = Int.MIN_VALUE
+
+      // Prepare object under test
+      val gattCallbackHandler = GattCallbackHandler(this)
+
+      // Act
+      gattCallbackHandler.onPhyRead(mockBleGatt, mockTx, mockRx, mockStatus)
+
+      // Assert
+      Assert.assertTrue(
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyRead).status == mockStatus,
       )
     }
 
@@ -502,7 +501,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyRead).txPhy == mockTx,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyRead).txPhy == mockTx,
       )
     }
 
@@ -523,7 +522,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyRead).rxPhy == mockRx,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyRead).rxPhy == mockRx,
       )
     }
 
@@ -545,7 +544,7 @@ class GattCallbackHandlerTest {
       gattCallbackHandler.onPhyUpdate(mockBleGatt, mockTx, mockRx, BluetoothGatt.GATT_SUCCESS)
 
       // Assert
-      Assert.assertTrue(gattCallbackHandler.eventBus().first() is BleEvent.OnPhyUpdate)
+      Assert.assertTrue(gattCallbackHandler.nativeEventBus().first() is OnPhyUpdate)
     }
 
   @Test
@@ -565,7 +564,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyUpdate).gatt === mockBleGatt,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyUpdate).gatt === mockBleGatt,
       )
     }
 
@@ -587,7 +586,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyUpdate).status == mockStatus,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyUpdate).status == mockStatus,
       )
     }
 
@@ -608,7 +607,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyUpdate).txPhy == mockTx,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyUpdate).txPhy == mockTx,
       )
     }
 
@@ -629,7 +628,7 @@ class GattCallbackHandlerTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleEvent.OnPhyUpdate).rxPhy == mockRx,
+        (gattCallbackHandler.nativeEventBus().first() as OnPhyUpdate).rxPhy == mockRx,
       )
     }
 

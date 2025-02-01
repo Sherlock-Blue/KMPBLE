@@ -1,8 +1,9 @@
 package com.sherlockblue.kmpble.ble.commandQueue.commands
 
 import android.bluetooth.BluetoothGatt
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnServicesDiscovered
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockSharedFlow
@@ -25,7 +26,7 @@ class DiscoverServicesQueueingTest {
             gatt = mockk<BluetoothGatt>(relaxed = true),
             bleQueue = commandQueue,
             coroutineScope = this,
-            gattCallbackEventBus = GattCallbackHandler(this).eventBus(),
+            gattCallbackEventBus = GattCallbackHandler(this).nativeEventBus(),
           ) { }
 
         // Assert
@@ -41,10 +42,10 @@ class DiscoverServicesQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnServicesDiscovered(
+              OnServicesDiscovered(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
               ),
@@ -72,12 +73,12 @@ class DiscoverServicesQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockBleEvent =
-        BleEvent.OnServicesDiscovered(
+        OnServicesDiscovered(
           gatt = MockBluetoothGatt.Builder().build(),
           status = BluetoothGatt.GATT_SUCCESS,
         )
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(mockBleEvent),
         )
@@ -110,7 +111,7 @@ class DiscoverServicesQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { }
 
         gattCallbackHandler.onServicesDiscovered(
@@ -133,10 +134,10 @@ class DiscoverServicesQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue(event is BleEvent.OnServicesDiscovered)
+          Assert.assertTrue(event is OnServicesDiscovered)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -165,11 +166,11 @@ class DiscoverServicesQueueingTest {
           gatt = mockk<BluetoothGatt>(relaxed = true),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnServicesDiscovered).gatt === mockBleGatt1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnServicesDiscovered).status == BluetoothGatt.STATE_DISCONNECTED)
+          Assert.assertTrue((event as OnServicesDiscovered).gatt === mockBleGatt1) // Same instance
+          Assert.assertTrue((event as OnServicesDiscovered).status == BluetoothGatt.STATE_DISCONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(

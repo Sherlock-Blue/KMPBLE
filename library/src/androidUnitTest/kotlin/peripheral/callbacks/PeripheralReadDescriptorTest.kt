@@ -3,8 +3,10 @@ package peripheral.callbacks
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnDescriptorRead
 import com.sherlockblue.kmpble.ble.fixtures.DEFAULT_UUID
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothDevice
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
@@ -26,7 +28,7 @@ class PeripheralReadDescriptorTest {
   // readDescriptor
 
   @Test
-  fun `ReadDescriptor with null Gatt returns CallbackError BleEvent`() =
+  fun `ReadDescriptor with null Gatt returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -49,14 +51,14 @@ class PeripheralReadDescriptorTest {
           descriptorUUID = DEFAULT_UUID,
         ) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadDescriptor with invalid Descriptor UUID returns CallbackError BleEvent`() =
+  fun `ReadDescriptor with invalid Descriptor UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -94,14 +96,14 @@ class PeripheralReadDescriptorTest {
           descriptorUUID = "Invalid UUID",
         ) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadDescriptor with invalid Characteristic UUID returns CallbackError BleEvent`() =
+  fun `ReadDescriptor with invalid Characteristic UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -139,14 +141,14 @@ class PeripheralReadDescriptorTest {
           descriptorUUID = DEFAULT_UUID,
         ) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadDescriptor returns OnDescriptorRead BleEvent`() =
+  fun `ReadDescriptor returns OnDescriptorRead BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -166,10 +168,10 @@ class PeripheralReadDescriptorTest {
           .setServices(listOf(mockService))
           .build()
       val mockEventBus =
-        MockMutableSharedFlow<BleEvent>(
+        MockMutableSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnDescriptorRead(
+              OnDescriptorRead(
                 gatt = mockGatt,
                 descriptor = mockDescriptor,
                 value = byteArrayOf(),
@@ -182,7 +184,7 @@ class PeripheralReadDescriptorTest {
       launch {
         // Prepare object under test
         val gattCallbackHandler = GattCallbackHandler(this)
-        gattCallbackHandler._eventBus = mockEventBus
+        gattCallbackHandler._nativeEventBus = mockEventBus
         val peripheral =
           Peripheral(
             device = mockDevice,
@@ -199,14 +201,14 @@ class PeripheralReadDescriptorTest {
           descriptorUUID = DEFAULT_UUID,
         ) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.OnDescriptorRead)
+          Assert.assertTrue(bleEvent is BleResponse.DescriptorRead)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadDescriptor with Invalid UUID returns ErrorCallback BleEvent`() =
+  fun `ReadDescriptor with Invalid UUID returns an Error BleResponse`() =
     runTest {
       // Arrange
       // Mocked Fixtures
@@ -244,14 +246,14 @@ class PeripheralReadDescriptorTest {
           descriptorUUID = "Invalid UUID",
         ) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.CallbackError)
+          Assert.assertTrue(bleEvent is BleResponse.Error)
           this.cancel()
         }
       }
     }
 
   @Test
-  fun `ReadDescriptor returns an OnDescriptorRead BleEvent`() =
+  fun `ReadDescriptor returns a DescriptorRead BleResponse`() =
     runTest {
       launch {
         // Arrange
@@ -269,7 +271,7 @@ class PeripheralReadDescriptorTest {
           MockBluetoothGattCallback.Builder()
             .setCoroutineScope(this)
             .setCallbackResponse(
-              BleEvent.OnDescriptorRead(
+              OnDescriptorRead(
                 gatt = MockBluetoothGatt.Builder().build(),
                 descriptor = mockDescriptor,
                 value = byteArrayOf(),
@@ -305,7 +307,7 @@ class PeripheralReadDescriptorTest {
           descriptorUUID = DEFAULT_UUID,
         ) { bleEvent ->
           // Assert
-          Assert.assertTrue(bleEvent is BleEvent.OnDescriptorRead)
+          Assert.assertTrue(bleEvent is BleResponse.DescriptorRead)
           this.cancel()
         }
       }

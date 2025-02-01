@@ -1,5 +1,7 @@
 package com.sherlockblue.kmpble.callbacks
 
+import com.sherlockblue.kmpble.ble.BleResponse
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -15,13 +17,19 @@ import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 
 class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject(), CBPeripheralDelegateProtocol {
-  private var _eventBus = MutableSharedFlow<BleEvent>()
+  private var _nativeEventBus = MutableSharedFlow<NativeBleEvent>()
 
-  fun eventBus() = _eventBus as SharedFlow<BleEvent>
+  fun nativeEventBus() = _nativeEventBus as SharedFlow<NativeBleEvent>
 
-  private fun publishEvent(event: BleEvent) {
+  private var _eventBus = MutableSharedFlow<BleResponse>()
+
+  fun eventBus() = _eventBus as SharedFlow<BleResponse>
+
+  private fun publishEvent(event: NativeBleEvent) {
     coroutineScope.launch {
-      _eventBus.emit(event)
+      _nativeEventBus.emit(event)
+      _nativeEventBus.emit(event)
+      event.toBleResponse().let { bleResponse -> _eventBus.emit(bleResponse) }
     }
   }
 
@@ -32,7 +40,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnServicesForServiceDiscovered(
+      OnServicesForServiceDiscovered(
         peripheral = peripheral,
         service = didDiscoverIncludedServicesForService,
       ),
@@ -46,7 +54,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnCharacteristicWrite(
+      OnCharacteristicWrite(
         peripheral = peripheral,
         characteristic = didWriteValueForCharacteristic,
       ),
@@ -60,7 +68,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnDescriptorWrite(
+      OnDescriptorWrite(
         peripheral = peripheral,
         descriptor = didWriteValueForDescriptor,
       ),
@@ -72,7 +80,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     didDiscoverServices: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnServicesDiscovered(
+      OnServicesDiscovered(
         peripheral = peripheral,
       ),
     )
@@ -85,7 +93,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnCharacteristicsDiscovered(
+      OnCharacteristicsDiscovered(
         peripheral = peripheral,
         service = didDiscoverCharacteristicsForService,
       ),
@@ -99,7 +107,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnDescriptorsDiscovered(
+      OnDescriptorsDiscovered(
         peripheral = peripheral,
         characteristic = didDiscoverDescriptorsForCharacteristic,
       ),
@@ -113,8 +121,13 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnCharacteristicUpdated(
+      OnCharacteristicUpdated(
         peripheral = peripheral,
+        characteristic = didUpdateValueForCharacteristic,
+      ),
+    )
+    publishEvent(
+      OnCharacteristicRead(
         characteristic = didUpdateValueForCharacteristic,
       ),
     )
@@ -127,8 +140,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnDescriptorUpdated(
-        peripheral = peripheral,
+      OnDescriptorRead(
         descriptor = didUpdateValueForDescriptor,
       ),
     )
@@ -140,7 +152,7 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
     error: NSError?,
   ) {
     publishEvent(
-      BleEvent.OnReadRemoteRssi(
+      OnReadRemoteRssi(
         peripheral = peripheral,
         didReadRSSI = didReadRSSI,
       ),

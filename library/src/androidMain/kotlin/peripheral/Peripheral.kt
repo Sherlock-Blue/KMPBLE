@@ -7,8 +7,9 @@ import com.sherlockblue.kmpble.INVALID_CHARACTERISTIC_ERROR
 import com.sherlockblue.kmpble.INVALID_DESCRIPTOR_ERROR
 import com.sherlockblue.kmpble.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.ble.BleResponse
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.Service
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.commandQueue.commands.Connect
 import com.sherlockblue.kmpble.ble.commandQueue.commands.Disconnect
@@ -19,23 +20,37 @@ import com.sherlockblue.kmpble.ble.commandQueue.commands.WriteCharacteristic
 import com.sherlockblue.kmpble.ble.commandQueue.commands.WriteDescriptor
 import com.sherlockblue.kmpble.ble.extensions.getCharacteristic
 import com.sherlockblue.kmpble.ble.extensions.getDescriptor
+import com.sherlockblue.kmpble.ble.extensions.getServices
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 actual class Peripheral(
-  public val device: BluetoothDevice,
+  private val device: BluetoothDevice,
   private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
   private val context: Context,
   private val gattCallbackHandler: GattCallbackHandler = GattCallbackHandler(coroutineScope = coroutineScope),
   private val commandQueue: CommandQueue = CommandQueue(),
 ) {
+  actual fun nativeEventBus(): Flow<com.sherlockblue.kmpble.ble.NativeBleEvent> = gattCallbackHandler.nativeEventBus()
+
   actual fun eventBus(): Flow<BleResponse> = gattCallbackHandler.eventBus()
+
+  private val _connected = MutableStateFlow<Boolean>(false)
+
+  actual fun connected() = _connected as StateFlow<Boolean>
+
+  private fun setConnectionStatus(status: Int) {
+    _connected.value = status == BluetoothGatt.STATE_CONNECTED
+  }
+
+  actual fun getServices() = gatt?.services?.getServices() ?: listOf<Service>()
 
   internal var gatt: BluetoothGatt? = null
 
@@ -45,7 +60,6 @@ actual class Peripheral(
     }
   }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   actual suspend fun connect(): BleResponse {
     return suspendCancellableCoroutine { continuation ->
       Connect(
@@ -55,8 +69,9 @@ actual class Peripheral(
         bleQueue = commandQueue,
         coroutineScope = coroutineScope,
       ) {
-        gatt = (it as BleEvent.OnConnectionStateChange).gatt
-        continuation.resume(it)
+        gatt = (it as OnConnectionStateChange).gatt
+        setConnectionStatus((it as OnConnectionStateChange).newState)
+        continuation.resume(it.toBleResponse())
       }
     }
   }
@@ -74,13 +89,12 @@ actual class Peripheral(
           gatt = gatt,
           bleQueue = commandQueue,
           coroutineScope = coroutineScope,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) {
-          continuation.resume(it)
+          setConnectionStatus((it as OnConnectionStateChange).newState)
+          continuation.resume(it.toBleResponse())
         }
-      } ?: continuation.resume(
-        BleEvent.CallbackError(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
-      )
+      } ?: continuation.resume(BleResponse.Error(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR))
     }
   }
 
@@ -97,12 +111,12 @@ actual class Peripheral(
           gatt = gatt,
           bleQueue = commandQueue,
           coroutineScope = coroutineScope,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) {
-          continuation.resume(it)
+          continuation.resume(it.toBleResponse())
         }
       } ?: continuation.resume(
-        BleEvent.CallbackError(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
+        BleResponse.Error(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
       )
     }
   }
@@ -125,15 +139,15 @@ actual class Peripheral(
             characteristic = characteristic,
             bleQueue = commandQueue,
             coroutineScope = coroutineScope,
-            gattCallbackEventBus = gattCallbackHandler.eventBus(),
+            gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
           ) {
-            continuation.resume(it)
+            continuation.resume(it.toBleResponse())
           }
         } ?: continuation.resume(
-          BleEvent.CallbackError(message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR), status = INVALID_CHARACTERISTIC_ERROR),
+          BleResponse.Error(message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR), status = INVALID_CHARACTERISTIC_ERROR),
         )
       } ?: continuation.resume(
-        BleEvent.CallbackError(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
+        BleResponse.Error(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
       )
     }
   }
@@ -161,15 +175,15 @@ actual class Peripheral(
             data = data,
             bleQueue = commandQueue,
             coroutineScope = coroutineScope,
-            gattCallbackEventBus = gattCallbackHandler.eventBus(),
+            gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
           ) {
-            continuation.resume(it)
+            continuation.resume(it.toBleResponse())
           }
         } ?: continuation.resume(
-          BleEvent.CallbackError(message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR), status = INVALID_CHARACTERISTIC_ERROR),
+          BleResponse.Error(message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR), status = INVALID_CHARACTERISTIC_ERROR),
         )
       } ?: continuation.resume(
-        BleEvent.CallbackError(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
+        BleResponse.Error(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
       )
     }
   }
@@ -197,18 +211,18 @@ actual class Peripheral(
               descriptor = descriptor,
               bleQueue = commandQueue,
               coroutineScope = coroutineScope,
-              gattCallbackEventBus = gattCallbackHandler.eventBus(),
+              gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
             ) {
-              continuation.resume(it)
+              continuation.resume(it.toBleResponse())
             }
           } ?: continuation.resume(
-            BleEvent.CallbackError(message = getErrorMessage(INVALID_DESCRIPTOR_ERROR), status = INVALID_DESCRIPTOR_ERROR),
+            BleResponse.Error(message = getErrorMessage(INVALID_DESCRIPTOR_ERROR), status = INVALID_DESCRIPTOR_ERROR),
           )
         } ?: continuation.resume(
-          BleEvent.CallbackError(message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR), status = INVALID_CHARACTERISTIC_ERROR),
+          BleResponse.Error(message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR), status = INVALID_CHARACTERISTIC_ERROR),
         )
       } ?: continuation.resume(
-        BleEvent.CallbackError(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
+        BleResponse.Error(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
       )
     }
   }
@@ -239,24 +253,24 @@ actual class Peripheral(
               data = data,
               bleQueue = commandQueue,
               coroutineScope = coroutineScope,
-              gattCallbackEventBus = gattCallbackHandler.eventBus(),
+              gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
             ) {
-              continuation.resume(it)
+              continuation.resume(it.toBleResponse())
             }
           } ?: continuation.resume(
-            BleEvent.CallbackError(
+            BleResponse.Error(
               message = getErrorMessage(INVALID_DESCRIPTOR_ERROR),
               status = INVALID_DESCRIPTOR_ERROR,
             ),
           )
         } ?: continuation.resume(
-          BleEvent.CallbackError(
+          BleResponse.Error(
             message = getErrorMessage(INVALID_CHARACTERISTIC_ERROR),
             status = INVALID_CHARACTERISTIC_ERROR,
           ),
         )
       } ?: continuation.resume(
-        BleEvent.CallbackError(
+        BleResponse.Error(
           message = getErrorMessage(NULL_GATT_ERROR),
           status = NULL_GATT_ERROR,
         ),

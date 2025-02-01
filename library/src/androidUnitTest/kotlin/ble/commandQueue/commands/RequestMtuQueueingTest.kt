@@ -3,8 +3,9 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 import android.bluetooth.BluetoothGatt
 import com.sherlockblue.kmpble.DEFAULT_MTU_SIZE
 import com.sherlockblue.kmpble.MAX_MTU_SIZE
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnMtuChanged
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockSharedFlow
@@ -28,7 +29,7 @@ class RequestMtuQueueingTest {
             mtu = MAX_MTU_SIZE,
             bleQueue = commandQueue,
             coroutineScope = this,
-            gattCallbackEventBus = GattCallbackHandler(this).eventBus(),
+            gattCallbackEventBus = GattCallbackHandler(this).nativeEventBus(),
           ) { }
 
         // Assert
@@ -44,10 +45,10 @@ class RequestMtuQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnMtuChanged(
+              OnMtuChanged(
                 gatt = MockBluetoothGatt.Builder().build(),
                 status = BluetoothGatt.STATE_CONNECTED,
                 mtu = MAX_MTU_SIZE,
@@ -77,13 +78,13 @@ class RequestMtuQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockBleEvent =
-        BleEvent.OnMtuChanged(
+        OnMtuChanged(
           gatt = MockBluetoothGatt.Builder().build(),
           status = BluetoothGatt.STATE_CONNECTED,
           mtu = MAX_MTU_SIZE,
         )
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(mockBleEvent),
         )
@@ -118,7 +119,7 @@ class RequestMtuQueueingTest {
           mtu = MAX_MTU_SIZE,
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { }
 
         gattCallbackHandler.onMtuChanged(
@@ -143,10 +144,10 @@ class RequestMtuQueueingTest {
           mtu = MAX_MTU_SIZE,
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue(event is BleEvent.OnMtuChanged)
+          Assert.assertTrue(event is OnMtuChanged)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -177,12 +178,12 @@ class RequestMtuQueueingTest {
           mtu = MAX_MTU_SIZE,
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnMtuChanged).gatt === mockBleGatt1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnMtuChanged).status == BluetoothGatt.STATE_DISCONNECTING)
-          Assert.assertTrue((event as BleEvent.OnMtuChanged).mtu == DEFAULT_MTU_SIZE)
+          Assert.assertTrue((event as OnMtuChanged).gatt === mockBleGatt1) // Same instance
+          Assert.assertTrue((event as OnMtuChanged).status == BluetoothGatt.STATE_DISCONNECTING)
+          Assert.assertTrue((event as OnMtuChanged).mtu == DEFAULT_MTU_SIZE)
         }
 
         gattCallbackHandler.onServiceChanged(

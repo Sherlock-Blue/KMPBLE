@@ -1,8 +1,4 @@
-<h1 align="center" style="font-size: 6.5em; font-weight: bold; color:blue;">
-<strong>KMP BLE</strong></h1>
-
-<p align="center" style="display: block; font-size: 1.5em; margin-block-start: 1em; margin-block-end: 1em;">Bluetooth Low Energy Framework Implemented With Kotlin Multiplatform
-</p>
+![KMP BLE](./kmpblebanner.jpg)
 
 ## About
 KMP BLE is Bluetooth Low Energy framework exposing both a high level API for multiplatform application developers and lower level native API's for IoT developers.<br>

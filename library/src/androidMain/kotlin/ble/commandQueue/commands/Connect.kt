@@ -3,8 +3,8 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnConnectionStateChange
 import com.sherlockblue.kmpble.ble.commandQueue.BleQueue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -25,8 +25,8 @@ class Connect(
 
   override fun execute() {
     coroutineScope.launch {
-      gattCallbackHandler.eventBus().collect { bleEvent ->
-        if (bleEvent is BleEvent.OnConnectionStateChange) {
+      gattCallbackHandler.nativeEventBus().collect { bleEvent ->
+        if (bleEvent is OnConnectionStateChange) {
           commandCallback(bleEvent)
           cleanup()
           cancel()

@@ -33,7 +33,7 @@ class CentralManagerCallbacksTest {
         )
 
         // Assert
-        assertTrue(centralManagerCallbacks.eventBus().first() is BleEvent.OnPeripheralConnect)
+        assertTrue(centralManagerCallbacks.nativeEventBus().first() is OnPeripheralConnect)
       }
     }
 
@@ -61,7 +61,7 @@ class CentralManagerCallbacksTest {
         )
 
         // Assert
-        assertTrue(centralManagerCallbacks.eventBus().first() is BleEvent.OnPeripheralDiscovered)
+        assertTrue(centralManagerCallbacks.nativeEventBus().first() is OnPeripheralDiscovered)
       }
     }
 
@@ -86,7 +86,7 @@ class CentralManagerCallbacksTest {
         )
 
         // Evaluate Result
-        assertTrue(centralManagerCallbacks.eventBus().first() is BleEvent.OnPeripheralDisconnect)
+        assertTrue(centralManagerCallbacks.nativeEventBus().first() is OnPeripheralDisconnect)
       }
     }
 
@@ -105,7 +105,7 @@ class CentralManagerCallbacksTest {
         centralManagerCallbacks.centralManagerDidUpdateState(central = mockCentral)
 
         // Evaluate Result
-        assertTrue(centralManagerCallbacks.eventBus().first() is BleEvent.OnServiceChanged)
+        assertTrue(centralManagerCallbacks.nativeEventBus().first() is OnServiceChanged)
       }
     }
 }

@@ -34,7 +34,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnServicesForServiceDiscovered)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnServicesForServiceDiscovered)
       }
     }
 
@@ -51,7 +51,7 @@ class PeripheralCallbacksTest {
         peripheralCallbacks.peripheral(peripheral = mockCBPeripheral, didDiscoverServices = null)
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnServicesDiscovered)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnServicesDiscovered)
       }
     }
 
@@ -72,7 +72,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnCharacteristicsDiscovered)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnCharacteristicsDiscovered)
       }
     }
 
@@ -96,7 +96,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnDescriptorsDiscovered)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnDescriptorsDiscovered)
       }
     }
 
@@ -120,7 +120,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnCharacteristicWrite)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnCharacteristicWrite)
       }
     }
 
@@ -142,7 +142,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnCharacteristicUpdated)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnCharacteristicUpdated)
       }
     }
 
@@ -164,7 +164,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnDescriptorWrite)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnDescriptorWrite)
       }
     }
 
@@ -188,7 +188,7 @@ class PeripheralCallbacksTest {
         )
 
         // Assert
-        assertTrue(peripheralCallbacks.eventBus().first() is BleEvent.OnDescriptorUpdated)
+        assertTrue(peripheralCallbacks.nativeEventBus().first() is OnDescriptorRead)
       }
     }
 }

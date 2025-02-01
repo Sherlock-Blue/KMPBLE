@@ -1,7 +1,7 @@
 package com.sherlockblue.kmpble.scanning
 
-import com.sherlockblue.kmpble.callbacks.BleEvent
 import com.sherlockblue.kmpble.callbacks.CentralManagerCallbacks
+import com.sherlockblue.kmpble.callbacks.OnPeripheralDiscovered
 import com.sherlockblue.kmpble.peripheral.Peripheral
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -24,8 +24,8 @@ actual class Scanner(
   private fun launchEventBusJob(coroutineScope: CoroutineScope) {
     eventBusJob =
       coroutineScope.launch {
-        (centralManager.delegate as CentralManagerCallbacks).eventBus().collect { event ->
-          if (event is BleEvent.OnPeripheralDiscovered) {
+        (centralManager.delegate as CentralManagerCallbacks).nativeEventBus().collect { event ->
+          if (event is OnPeripheralDiscovered) {
             _scanResults.emit(
               ScannedResult(
                 peripheral =

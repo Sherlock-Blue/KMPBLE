@@ -3,8 +3,9 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattDescriptor
 import android.os.Build
-import com.sherlockblue.kmpble.ble.callbacks.BleEvent
+import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
+import com.sherlockblue.kmpble.ble.callbacks.OnDescriptorWrite
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattDescriptor
@@ -30,7 +31,7 @@ class WriteDescriptorQueueingTest {
             data = byteArrayOf(),
             bleQueue = commandQueue,
             coroutineScope = this,
-            gattCallbackEventBus = GattCallbackHandler(this).eventBus(),
+            gattCallbackEventBus = GattCallbackHandler(this).nativeEventBus(),
           ) { }
 
         // Assert
@@ -46,10 +47,10 @@ class WriteDescriptorQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnDescriptorWrite(
+              OnDescriptorWrite(
                 gatt = MockBluetoothGatt.Builder().build(),
                 descriptor = MockBluetoothGattDescriptor.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
@@ -81,10 +82,10 @@ class WriteDescriptorQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(
-              BleEvent.OnDescriptorWrite(
+              OnDescriptorWrite(
                 gatt = MockBluetoothGatt.Builder().build(),
                 descriptor = MockBluetoothGattDescriptor.Builder().build(),
                 status = BluetoothGatt.GATT_SUCCESS,
@@ -115,13 +116,13 @@ class WriteDescriptorQueueingTest {
       // Arrange
       // Mocked Fixtures
       val mockBleEvent =
-        BleEvent.OnDescriptorWrite(
+        OnDescriptorWrite(
           gatt = MockBluetoothGatt.Builder().build(),
           descriptor = MockBluetoothGattDescriptor.Builder().build(),
           status = BluetoothGatt.GATT_SUCCESS,
         )
       val mockEventBus =
-        MockSharedFlow<BleEvent>(
+        MockSharedFlow<NativeBleEvent>(
           events =
             listOf(mockBleEvent),
         )
@@ -157,7 +158,7 @@ class WriteDescriptorQueueingTest {
           data = byteArrayOf(),
           bleQueue = commandQueue,
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { }
 
         gattCallbackHandler.onDescriptorWrite(
@@ -183,10 +184,10 @@ class WriteDescriptorQueueingTest {
           data = byteArrayOf(),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue(event is BleEvent.OnDescriptorWrite)
+          Assert.assertTrue(event is OnDescriptorWrite)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -221,12 +222,12 @@ class WriteDescriptorQueueingTest {
           data = byteArrayOf(),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnDescriptorWrite).gatt === mockBleGatt1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnDescriptorWrite).descriptor === mockBleDescriptor1) // Same instance
-          Assert.assertTrue((event as BleEvent.OnDescriptorWrite).status == BluetoothGatt.STATE_DISCONNECTED)
+          Assert.assertTrue((event as OnDescriptorWrite).gatt === mockBleGatt1) // Same instance
+          Assert.assertTrue((event as OnDescriptorWrite).descriptor === mockBleDescriptor1) // Same instance
+          Assert.assertTrue((event as OnDescriptorWrite).status == BluetoothGatt.STATE_DISCONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(
@@ -273,12 +274,12 @@ class WriteDescriptorQueueingTest {
           data = byteArrayOf(),
           bleQueue = CommandQueue(),
           coroutineScope = this,
-          gattCallbackEventBus = gattCallbackHandler.eventBus(),
+          gattCallbackEventBus = gattCallbackHandler.nativeEventBus(),
         ) { event ->
           // Assert
-          Assert.assertTrue((event as BleEvent.OnDescriptorWrite).gatt === mockBleGatt2) // Same instance
-          Assert.assertTrue((event as BleEvent.OnDescriptorWrite).descriptor === mockBleDescriptor2) // Same instance
-          Assert.assertTrue((event as BleEvent.OnDescriptorWrite).status == BluetoothGatt.STATE_DISCONNECTED)
+          Assert.assertTrue((event as OnDescriptorWrite).gatt === mockBleGatt2) // Same instance
+          Assert.assertTrue((event as OnDescriptorWrite).descriptor === mockBleDescriptor2) // Same instance
+          Assert.assertTrue((event as OnDescriptorWrite).status == BluetoothGatt.STATE_DISCONNECTED)
         }
 
         gattCallbackHandler.onServiceChanged(
