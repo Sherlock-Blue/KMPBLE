@@ -47,11 +47,11 @@ actual class Scanner(
               _scannedResults.emit(
                 ScannedResult(
                   peripheral =
-                  Peripheral(
-                    device = scannedDevice,
-                    coroutineScope = coroutineScope,
-                    context = context,
-                  ),
+                    Peripheral(
+                      device = scannedDevice,
+                      coroutineScope = coroutineScope,
+                      context = context,
+                    ),
                   advertisingData = advertisementDataFromScanResult(scannedResult),
                   rssi = scannedResult.rssi,
                 ),
