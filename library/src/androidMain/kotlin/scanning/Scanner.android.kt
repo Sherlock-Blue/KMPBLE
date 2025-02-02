@@ -41,23 +41,21 @@ actual class Scanner(
         callbackType: Int,
         result: android.bluetooth.le.ScanResult?,
       ) {
-        result!!.let { scannedResult ->
-          scannedResult.scanRecord!!.bytes!!.let { scannedRecord ->
-            scannedResult.device!!.let { scannedDevice ->
-              coroutineScope.launch {
-                _scannedResults.emit(
-                  ScannedResult(
-                    peripheral =
-                      Peripheral(
-                        device = scannedDevice,
-                        coroutineScope = coroutineScope,
-                        context = context,
-                      ),
-                    advertisingData = advertisementDataFromScanResult(scannedResult),
-                    rssi = scannedResult.rssi,
+        result?.let { scannedResult ->
+          scannedResult.device?.let { scannedDevice ->
+            coroutineScope.launch {
+              _scannedResults.emit(
+                ScannedResult(
+                  peripheral =
+                  Peripheral(
+                    device = scannedDevice,
+                    coroutineScope = coroutineScope,
+                    context = context,
                   ),
-                )
-              }
+                  advertisingData = advertisementDataFromScanResult(scannedResult),
+                  rssi = scannedResult.rssi,
+                ),
+              )
             }
           }
         }
