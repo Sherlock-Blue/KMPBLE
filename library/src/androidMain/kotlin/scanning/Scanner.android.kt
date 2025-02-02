@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.sherlockblue.kmpble.peripheral.Peripheral
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -37,27 +39,24 @@ actual class Scanner(
 
   private val scannerCallback =
     object : ScanCallback() {
+      @RequiresApi(Build.VERSION_CODES.O)
       override fun onScanResult(
         callbackType: Int,
-        result: android.bluetooth.le.ScanResult?,
+        result: android.bluetooth.le.ScanResult,
       ) {
-        result?.let { scannedResult ->
-          scannedResult.device?.let { scannedDevice ->
-            coroutineScope.launch {
-              _scannedResults.emit(
-                ScannedResult(
-                  peripheral =
-                    Peripheral(
-                      device = scannedDevice,
-                      coroutineScope = coroutineScope,
-                      context = context,
-                    ),
-                  advertisingData = advertisementDataFromScanResult(scannedResult),
-                  rssi = scannedResult.rssi,
+        coroutineScope.launch {
+          _scannedResults.emit(
+            ScannedResult(
+              peripheral =
+                Peripheral(
+                  device = result.device,
+                  coroutineScope = coroutineScope,
+                  context = context,
                 ),
-              )
-            }
-          }
+              advertisingData = advertisementDataFromScanResult(result),
+              rssi = result.rssi,
+            ),
+          )
         }
       }
 
