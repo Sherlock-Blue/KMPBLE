@@ -27,7 +27,6 @@ class CentralManagerCallbacks(private val coroutineScope: CoroutineScope) : NSOb
   private fun publishEvent(event: NativeBleEvent) {
     coroutineScope.launch {
       _nativeEventBus.emit(event)
-      _nativeEventBus.emit(event)
       event.toBleResponse().let { bleResponse -> _eventBus.emit(bleResponse) }
     }
   }

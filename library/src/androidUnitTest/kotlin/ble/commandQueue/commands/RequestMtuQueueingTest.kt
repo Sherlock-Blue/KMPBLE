@@ -1,14 +1,14 @@
 package com.sherlockblue.kmpble.ble.commandQueue.commands
 
 import android.bluetooth.BluetoothGatt
-import com.sherlockblue.kmpble.DEFAULT_MTU_SIZE
-import com.sherlockblue.kmpble.MAX_MTU_SIZE
 import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
 import com.sherlockblue.kmpble.ble.callbacks.OnMtuChanged
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockSharedFlow
+import com.sherlockblue.kmpble.constants.DEFAULT_MTU_SIZE
+import com.sherlockblue.kmpble.constants.MAX_MTU_SIZE
 import io.mockk.mockk
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch

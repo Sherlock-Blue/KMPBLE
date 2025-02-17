@@ -32,7 +32,7 @@ The architecture of the BLE command processing queue is inspired by the simplifi
 
 #### UML
 
-```java
+```code
 +-----------------------------+
 |    BleCommand (Sealed)      |
 |  +-----------------------+  |-------+
@@ -103,7 +103,7 @@ The event bus architecture is being used for this library because, in addition t
 
 Lint configuration is defined in .editorconfig file in the project root.
 
-```java
+```code
 ./gradlew ktlintFormat
 ```
 
@@ -121,7 +121,7 @@ This project implements tests at the implementation level. So, in addition to pr
 
 To run unit tests on the Android side, use this task:
 
-```java
+```code
 ./gradlew ktlintCheck koverHTMLReport
 ```
 
@@ -129,13 +129,13 @@ Tests on the iOS side need to be run from the IDE.
 
 ### Publish
 
-```java
+```code
 ./gradlew publishToMavenLocal
 ```
 
 #### Background
 
-The Android code for KMPBLE derives from the Sherlock Blue app, published in early May, 2023, heavily refactured to utilize coroutines.
+The Android code for KMPBLE derives from the Sherlock Blue app, published in early May, 2023, heavily refactored to utilize coroutines.
 
 
 ## Friends Of The Show

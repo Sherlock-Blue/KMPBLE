@@ -2,11 +2,11 @@ package com.sherlockblue.kmpble.ble.callbacks
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import com.sherlockblue.kmpble.NULL_CHARACTERISTIC_ERROR
-import com.sherlockblue.kmpble.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCharacteristic
 import com.sherlockblue.kmpble.ble.fixtures.TEST_STATUS
+import com.sherlockblue.kmpble.constants.NULL_CHARACTERISTIC_ERROR
+import com.sherlockblue.kmpble.constants.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -269,7 +269,10 @@ class NativeCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -289,7 +292,10 @@ class NativeCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_CHARACTERISTIC_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_CHARACTERISTIC_ERROR,
+          ),
       )
     }
 
@@ -419,7 +425,10 @@ class NativeCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -484,7 +493,10 @@ class NativeCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_CHARACTERISTIC_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_CHARACTERISTIC_ERROR,
+          ),
       )
     }
 
@@ -853,7 +865,10 @@ class NativeCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -914,7 +929,10 @@ class NativeCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_CHARACTERISTIC_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_CHARACTERISTIC_ERROR,
+          ),
       )
     }
 

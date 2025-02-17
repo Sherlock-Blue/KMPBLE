@@ -25,14 +25,14 @@ actual class Scanner(
 
   private var isScanning = false // BluetoothLeScanner does not expose its scanning state
 
-  actual suspend fun start() {
+  actual fun start() {
     if (!isScanning) {
       isScanning = true
       bluetoothLeScanner.startScan(scannerCallback)
     }
   }
 
-  actual suspend fun stop() {
+  actual fun stop() {
     isScanning = false
     bluetoothLeScanner.stopScan(scannerCallback) // Must be the same instance passed in startScan
   }

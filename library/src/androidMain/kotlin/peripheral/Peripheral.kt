@@ -3,9 +3,6 @@ package com.sherlockblue.kmpble.peripheral
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.content.Context
-import com.sherlockblue.kmpble.INVALID_CHARACTERISTIC_ERROR
-import com.sherlockblue.kmpble.INVALID_DESCRIPTOR_ERROR
-import com.sherlockblue.kmpble.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.Service
 import com.sherlockblue.kmpble.ble.callbacks.GattCallbackHandler
@@ -21,6 +18,9 @@ import com.sherlockblue.kmpble.ble.commandQueue.commands.WriteDescriptor
 import com.sherlockblue.kmpble.ble.extensions.getCharacteristic
 import com.sherlockblue.kmpble.ble.extensions.getDescriptor
 import com.sherlockblue.kmpble.ble.extensions.getServices
+import com.sherlockblue.kmpble.constants.INVALID_CHARACTERISTIC_ERROR
+import com.sherlockblue.kmpble.constants.INVALID_DESCRIPTOR_ERROR
+import com.sherlockblue.kmpble.constants.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +32,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 actual class Peripheral(
-  private val device: BluetoothDevice,
+  val device: BluetoothDevice,
   private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
   private val context: Context,
   private val gattCallbackHandler: GattCallbackHandler = GattCallbackHandler(coroutineScope = coroutineScope),

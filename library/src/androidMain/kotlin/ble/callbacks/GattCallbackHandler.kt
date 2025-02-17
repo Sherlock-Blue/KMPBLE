@@ -4,11 +4,11 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import com.sherlockblue.kmpble.NULL_CHARACTERISTIC_ERROR
-import com.sherlockblue.kmpble.NULL_DESCRIPTOR_ERROR
-import com.sherlockblue.kmpble.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.NativeBleEvent
+import com.sherlockblue.kmpble.constants.NULL_CHARACTERISTIC_ERROR
+import com.sherlockblue.kmpble.constants.NULL_DESCRIPTOR_ERROR
+import com.sherlockblue.kmpble.constants.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow

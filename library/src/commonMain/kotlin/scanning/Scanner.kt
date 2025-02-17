@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 expect class Scanner {
   fun scanResults(): Flow<ScannedResult>
 
-  suspend fun start()
+  fun start()
 
-  suspend fun stop()
+  fun stop()
 }

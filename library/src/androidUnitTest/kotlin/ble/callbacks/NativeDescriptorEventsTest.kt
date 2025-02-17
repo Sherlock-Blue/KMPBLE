@@ -2,11 +2,11 @@ package com.sherlockblue.kmpble.ble.callbacks
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattDescriptor
-import com.sherlockblue.kmpble.NULL_DESCRIPTOR_ERROR
-import com.sherlockblue.kmpble.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattDescriptor
 import com.sherlockblue.kmpble.ble.fixtures.TEST_STATUS
+import com.sherlockblue.kmpble.constants.NULL_DESCRIPTOR_ERROR
+import com.sherlockblue.kmpble.constants.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -135,7 +135,10 @@ class NativeDescriptorEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -198,7 +201,10 @@ class NativeDescriptorEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_DESCRIPTOR_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_DESCRIPTOR_ERROR,
+          ),
       )
     }
 
@@ -555,7 +561,10 @@ class NativeDescriptorEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -614,7 +623,10 @@ class NativeDescriptorEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message == getErrorMessage(NULL_DESCRIPTOR_ERROR),
+        (gattCallbackHandler.nativeEventBus().first() as CallbackError).message ==
+          getErrorMessage(
+            NULL_DESCRIPTOR_ERROR,
+          ),
       )
     }
 

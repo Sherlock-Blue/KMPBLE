@@ -2,12 +2,12 @@ package com.sherlockblue.kmpble.ble.callbacks
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import com.sherlockblue.kmpble.NULL_CHARACTERISTIC_ERROR
-import com.sherlockblue.kmpble.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGattCharacteristic
 import com.sherlockblue.kmpble.ble.fixtures.TEST_STATUS
+import com.sherlockblue.kmpble.constants.NULL_CHARACTERISTIC_ERROR
+import com.sherlockblue.kmpble.constants.NULL_GATT_ERROR
 import com.sherlockblue.kmpble.constants.getErrorMessage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -229,7 +229,10 @@ class CommonCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -249,7 +252,10 @@ class CommonCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message == getErrorMessage(NULL_CHARACTERISTIC_ERROR),
+        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message ==
+          getErrorMessage(
+            NULL_CHARACTERISTIC_ERROR,
+          ),
       )
     }
 
@@ -359,7 +365,10 @@ class CommonCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -424,7 +433,10 @@ class CommonCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message == getErrorMessage(NULL_CHARACTERISTIC_ERROR),
+        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message ==
+          getErrorMessage(
+            NULL_CHARACTERISTIC_ERROR,
+          ),
       )
     }
 
@@ -741,7 +753,10 @@ class CommonCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message == getErrorMessage(NULL_GATT_ERROR),
+        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message ==
+          getErrorMessage(
+            NULL_GATT_ERROR,
+          ),
       )
     }
 
@@ -802,7 +817,10 @@ class CommonCharacteristicEventsTest {
 
       // Assert
       Assert.assertTrue(
-        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message == getErrorMessage(NULL_CHARACTERISTIC_ERROR),
+        (gattCallbackHandler.eventBus().first() as BleResponse.Error).message ==
+          getErrorMessage(
+            NULL_CHARACTERISTIC_ERROR,
+          ),
       )
     }
 

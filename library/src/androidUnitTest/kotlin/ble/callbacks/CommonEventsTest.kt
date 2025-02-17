@@ -1,7 +1,6 @@
 package com.sherlockblue.kmpble.ble.callbacks
 
 import android.bluetooth.BluetoothGatt
-import com.sherlockblue.kmpble.DEFAULT_MTU_SIZE
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.fixtures.MockBluetoothGatt
 import com.sherlockblue.kmpble.ble.fixtures.TEST_MTU
@@ -9,6 +8,7 @@ import com.sherlockblue.kmpble.ble.fixtures.TEST_RSSI
 import com.sherlockblue.kmpble.ble.fixtures.TEST_RX
 import com.sherlockblue.kmpble.ble.fixtures.TEST_STATUS
 import com.sherlockblue.kmpble.ble.fixtures.TEST_TX
+import com.sherlockblue.kmpble.constants.DEFAULT_MTU_SIZE
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert

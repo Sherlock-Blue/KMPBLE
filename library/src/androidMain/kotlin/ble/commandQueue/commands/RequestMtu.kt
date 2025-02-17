@@ -2,10 +2,10 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import com.sherlockblue.kmpble.MAX_MTU_SIZE
 import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.OnMtuChanged
 import com.sherlockblue.kmpble.ble.commandQueue.BleQueue
+import com.sherlockblue.kmpble.constants.MAX_MTU_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharedFlow
