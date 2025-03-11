@@ -35,7 +35,7 @@ actual class Scanner(
       }
     }
   internal var centralManager: CBCentralManager = CBCentralManager(centralManagerCallbacks, null, null)
-  private var centralManagerState: CBManagerState = CBManagerStateUnknown
+  internal var centralManagerState: CBManagerState = CBManagerStateUnknown
 
   private var scanningBusJob: Job =
     coroutineScope.launch {

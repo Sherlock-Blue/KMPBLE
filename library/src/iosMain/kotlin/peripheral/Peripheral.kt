@@ -17,6 +17,7 @@ import com.sherlockblue.kmpble.callbacks.OnServicesDiscovered
 import com.sherlockblue.kmpble.callbacks.PeripheralCallbacks
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -113,109 +114,6 @@ actual class Peripheral(
     }
   }
 
-  actual fun discoverServices(callback: (BleResponse) -> Unit) {
-    coroutineScope.launch {
-      callback(discoverServices())
-    }
-  }
-
-  actual suspend fun discoverServices(): BleResponse {
-    return suspendCancellableCoroutine { continuation ->
-      coroutineScope.launch {
-        peripheralDelegate.nativeEventBus().collect { bleEvent ->
-          if (bleEvent is OnServicesDiscovered) {
-            continuation.resume(bleEvent.toBleResponse())
-            cancel()
-          }
-        }
-      }
-      peripheral.discoverServices(null)
-    }
-  }
-
-  private suspend fun getCharacteristicsForAllServices(services: List<CBService>): BleResponse {
-    services.forEach { service ->
-      getCharacteristicsForService((service as CBService)).also { bleResponse ->
-        if (bleResponse is BleResponse.Error) {
-          return bleResponse
-        }
-      }
-    }
-    return BleResponse.ServicesDiscovered(status = 0)
-  }
-
-  fun discoverCharacteristicsForService(
-    uuid: String,
-    callback: (BleResponse) -> Unit,
-  ) {
-    coroutineScope.launch {
-      callback(discoverCharacteristicsForService(uuid).toBleResponse())
-    }
-  }
-
-  private suspend fun getCharacteristicsForService(service: CBService): BleResponse {
-    service.characteristics?.forEach { characteristic ->
-      discoverCharacteristicsForService((characteristic as CBCharacteristic).UUID.UUIDString).also { nativeBleEvent ->
-        if (nativeBleEvent is CallbackError) {
-          return nativeBleEvent.toBleResponse()
-        }
-      }
-    }
-    return BleResponse.ServicesDiscovered(status = 0)
-  }
-
-  suspend fun discoverCharacteristicsForService(uuid: String): NativeBleEvent {
-    return suspendCancellableCoroutine { continuation ->
-      coroutineScope.launch {
-        peripheralDelegate.nativeEventBus().collect { bleEvent ->
-          if (bleEvent is OnCharacteristicsDiscovered) {
-            continuation.resume(bleEvent)
-            cancel()
-          }
-        }
-      }
-      getService(uuid)?.let { service ->
-        peripheral.discoverCharacteristics(null, service)
-      }
-    }
-  }
-
-  fun discoverDescriptors(
-    uuid: String,
-    callback: (BleResponse) -> Unit,
-  ) {
-    coroutineScope.launch {
-      callback(discoverDescriptors(uuid).toBleResponse())
-    }
-  }
-
-  private suspend fun getDescriptorsForCharacteristic(characteristics: CBCharacteristic): BleResponse {
-    characteristics.descriptors?.forEach { descriptor ->
-      discoverDescriptors((descriptor as CBDescriptor).UUID.UUIDString).also { nativeBleEvent ->
-        if (nativeBleEvent is CallbackError) {
-          return nativeBleEvent.toBleResponse()
-        }
-      }
-    }
-    return BleResponse.ServicesDiscovered(status = 0)
-  }
-
-  suspend fun discoverDescriptors(uuid: String): NativeBleEvent {
-    return suspendCancellableCoroutine { continuation ->
-      coroutineScope.launch {
-        peripheralDelegate.nativeEventBus().collect { bleEvent ->
-          if (bleEvent is OnDescriptorsDiscovered) {
-            continuation.resume(bleEvent)
-            cancel()
-          }
-        }
-      }
-      getCharacteristic(uuid)?.let { characteristic ->
-        peripheral.discoverDescriptorsForCharacteristic(characteristic)
-      }
-    }
-  }
-
   actual fun readCharacteristic(
     uuid: String,
     callback: (BleResponse) -> Unit,
@@ -235,7 +133,9 @@ actual class Peripheral(
           }
         }
       }
-      peripheral.readValueForCharacteristic(getCharacteristic(uuid)!!)
+      getCBCharacteristic(uuid)?.let { characteristic ->
+        peripheral.readValueForCharacteristic(characteristic)
+      }
     }
   }
 
@@ -262,7 +162,13 @@ actual class Peripheral(
           }
         }
       }
-      peripheral.writeValue(data.toNSData(), getCharacteristic(uuid)!!, 0L)
+      getCBCharacteristic(uuid)?.let { characteristic ->
+        peripheral.writeValue(
+          data = data.toNSData(),
+          forCharacteristic = characteristic,
+          type = 0L,
+        ) // CBCharacteristicWriteType.withResponse = 0
+      }
     }
   }
 
@@ -289,7 +195,7 @@ actual class Peripheral(
           }
         }
       }
-      peripheral.readValueForDescriptor(getDescriptor(characteristicUUID, descriptorUUID)!!)
+      peripheral.readValueForDescriptor(getCBDescriptor(characteristicUUID, descriptorUUID)!!)
     }
   }
 
@@ -319,11 +225,11 @@ actual class Peripheral(
           }
         }
       }
-      peripheral.writeValue(data.toNSData(), getDescriptor(characteristicUUID, descriptorUUID)!!)
+      peripheral.writeValue(data.toNSData(), getCBDescriptor(characteristicUUID, descriptorUUID)!!)
     }
   }
 
-  private fun getService(uuid: String): CBService? {
+  private fun getCBService(uuid: String): CBService? {
     var result: CBService? = null
     peripheral.services?.forEach { service ->
       if ((service as CBService).UUID.UUIDString().contains(uuid, ignoreCase = true)) {
@@ -333,7 +239,7 @@ actual class Peripheral(
     return result
   }
 
-  private fun getCharacteristic(uuid: String): CBCharacteristic? {
+  private fun getCBCharacteristic(uuid: String): CBCharacteristic? {
     var result: CBCharacteristic? = null
     peripheral.services?.forEach { service ->
       (service as CBService).characteristics?.forEach { characteristic ->
@@ -346,7 +252,7 @@ actual class Peripheral(
     return result
   }
 
-  private fun getDescriptor(uuid: String): CBDescriptor? {
+  private fun getCBDescriptor(uuid: String): CBDescriptor? {
     var result: CBDescriptor? = null
     peripheral.services?.forEach { service ->
       (service as CBService).characteristics?.forEach { characteristic ->
@@ -362,17 +268,91 @@ actual class Peripheral(
     return result
   }
 
-  private fun getDescriptor(
+  private fun getCBDescriptor(
     characteristicUUID: String,
     descriptorUUID: String,
   ): CBDescriptor? {
     var result: CBDescriptor? = null
-    getCharacteristic(characteristicUUID)?.descriptors?.forEach { descriptor ->
+    getCBCharacteristic(characteristicUUID)?.descriptors?.forEach { descriptor ->
       val desc = descriptor as CBDescriptor
       if (desc.UUID.UUIDString().contains(descriptorUUID, ignoreCase = true)) {
         result = desc
       }
     }
     return result
+  }
+
+  // Service Discovery
+  actual fun discoverServices(callback: (BleResponse) -> Unit) {
+    coroutineScope.launch {
+      callback(discoverServices())
+    }
+  }
+
+  actual suspend fun discoverServices(): BleResponse {
+    return discoverAllAttributes()
+  }
+
+  private suspend fun discoverAllAttributes(): BleResponse {
+    val discoverServicesResult = discoverCBServices()
+    if (discoverServicesResult !is CallbackError) {
+      peripheral.services?.forEach { service ->
+        discoverCBCharacteristics(service as CBService).also {
+          if (it is CallbackError) {
+            return (it.toBleResponse())
+          }
+          service.characteristics?.forEach { characteristic ->
+            discoverCBDescriptors(characteristic as CBCharacteristic).also {
+              if (it is CallbackError) {
+                return (it.toBleResponse())
+              }
+            }
+          }
+        }
+      }
+    }
+    return (discoverServicesResult.toBleResponse())
+  }
+
+  suspend fun discoverCBServices(): NativeBleEvent {
+    return suspendCancellableCoroutine { continuation ->
+      coroutineScope.launch {
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if ((bleEvent is OnServicesDiscovered) || (bleEvent is CallbackError)) {
+            continuation.resume(bleEvent)
+            cancel()
+          }
+        }
+      }
+      peripheral.discoverServices(null)
+    }
+  }
+
+  suspend fun discoverCBCharacteristics(service: CBService): NativeBleEvent {
+    return suspendCancellableCoroutine { continuation ->
+      coroutineScope.launch {
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if ((bleEvent is OnCharacteristicsDiscovered) || (bleEvent is CallbackError)) {
+            continuation.resume(bleEvent)
+          }
+          cancel()
+        }
+      }
+      peripheral.discoverCharacteristics(null, service)
+    }
+  }
+
+  suspend fun discoverCBDescriptors(characteristic: CBCharacteristic): NativeBleEvent {
+    return suspendCancellableCoroutine { continuation ->
+      coroutineScope.launch {
+        peripheralDelegate.nativeEventBus().collect { bleEvent ->
+          if ((bleEvent is OnDescriptorsDiscovered) || (bleEvent is CallbackError)) {
+            continuation.resume(bleEvent)
+          }
+          cancel()
+        }
+      }
+      peripheral.discoverDescriptorsForCharacteristic(characteristic)
+    }
   }
 }

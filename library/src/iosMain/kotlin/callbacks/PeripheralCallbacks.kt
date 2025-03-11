@@ -28,8 +28,9 @@ class PeripheralCallbacks(private val coroutineScope: CoroutineScope) : NSObject
   private fun publishEvent(event: NativeBleEvent) {
     coroutineScope.launch {
       _nativeEventBus.emit(event)
-      _nativeEventBus.emit(event)
-      event.toBleResponse().let { bleResponse -> _eventBus.emit(bleResponse) }
+      if (event.toBleResponse() !is BleResponse.Error) {
+        _eventBus.emit(event.toBleResponse())
+      }
     }
   }
 

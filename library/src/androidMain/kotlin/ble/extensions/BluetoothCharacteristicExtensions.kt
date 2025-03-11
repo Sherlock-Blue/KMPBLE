@@ -21,7 +21,7 @@ fun BluetoothGattCharacteristic.toCharacteristic(): Characteristic =
   Characteristic(
     UUID = uuid.toString(),
     serviceUUID = service.uuid.toString(),
-    data = value,
+    data = value ?: byteArrayOf(),
     descriptors = descriptors.getDescriptors(),
   )
 
@@ -29,7 +29,7 @@ fun BluetoothGattDescriptor.toDescriptor(): Descriptor =
   Descriptor(
     UUID = uuid.toString(),
     characteristicUUID = characteristic.uuid.toString(),
-    data = value,
+    data = value ?: byteArrayOf(),
   )
 
 fun List<BluetoothGattService>.getServices() = map { service -> service.toService() }

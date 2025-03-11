@@ -2,10 +2,15 @@ package peripheral.callbacks
 
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.callbacks.CentralManagerCallbacks
+import com.sherlockblue.kmpble.callbacks.OnCharacteristicsDiscovered
+import com.sherlockblue.kmpble.callbacks.OnDescriptorsDiscovered
+import com.sherlockblue.kmpble.callbacks.OnServicesDiscovered
 import com.sherlockblue.kmpble.callbacks.PeripheralCallbacks
 import com.sherlockblue.kmpble.fixtures.DEFAULT_TEST_RUNS
 import com.sherlockblue.kmpble.fixtures.DEFAULT_UUID
 import com.sherlockblue.kmpble.fixtures.MockCBCentralManager
+import com.sherlockblue.kmpble.fixtures.MockCBCharacteristic
+import com.sherlockblue.kmpble.fixtures.MockCBService
 import com.sherlockblue.kmpble.fixtures.mockCBPeripheral
 import com.sherlockblue.kmpble.peripheral.Peripheral
 import kotlinx.coroutines.launch
@@ -121,7 +126,7 @@ class PeripheralTest {
     }
 
   @Test
-  fun `discoverServices function calls discoverServices in the CBPeripheral exactly once`() =
+  fun `discoverCBServices function calls discoverServices in the CBPeripheral exactly once`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -139,16 +144,17 @@ class PeripheralTest {
           )
 
         // Act
-        testPeripheral.discoverServices { bleEvent ->
-          // Assert
-          assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverServices"))
-        }
+        val result = testPeripheral.discoverCBServices()
+
+        // Assert
+        assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverServices"))
+
         testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverServices function returns ServicesDiscovered BleResponse`() =
+  fun `discoverCBServices function returns ServicesDiscovered BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -166,16 +172,17 @@ class PeripheralTest {
           )
 
         // Act
-        testPeripheral.discoverServices { bleEvent ->
-          // Assert
-          assertTrue(bleEvent is BleResponse.ServicesDiscovered)
-        }
+        val result = testPeripheral.discoverCBServices()
+
+        // Assert
+        assertTrue(result is OnServicesDiscovered)
+
         testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverCharacteristics function calls discoverCharacteristics in the CBPeripheral exactly once`() =
+  fun `discoverCBCharacteristics function calls discoverCharacteristics in the CBPeripheral exactly once`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -193,16 +200,16 @@ class PeripheralTest {
           )
 
         // Act
-        testPeripheral.discoverCharacteristicsForService(DEFAULT_UUID) { bleEvent ->
-          // Assert
-          assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverCharacteristics"))
-        }
+        testPeripheral.discoverCBCharacteristics(MockCBService())
+
+        // Assert
+        assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverCharacteristics"))
         testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverCharacteristics function returns BleResponse`() =
+  fun `discoverCBCharacteristics function returns BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -220,16 +227,16 @@ class PeripheralTest {
           )
 
         // Act
-        testPeripheral.discoverCharacteristicsForService(DEFAULT_UUID) { bleEvent ->
-          // Assert
-          assertTrue(bleEvent is BleResponse.Error) // TODO
-        }
+        val bleEvent = testPeripheral.discoverCBCharacteristics(MockCBService())
+
+        // Assert
+        assertTrue(bleEvent is OnCharacteristicsDiscovered) // TODO
         testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverDescriptors function calls discoverDescriptors in the CBPeripheral exactly once`() =
+  fun `discoverCBDescriptors function calls discoverDescriptors in the CBPeripheral exactly once`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -247,16 +254,16 @@ class PeripheralTest {
           )
 
         // Act
-        testPeripheral.discoverDescriptors(DEFAULT_UUID) { bleEvent ->
-          // Assert
-          assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverDescriptors"))
-        }
+        val bleEvent = testPeripheral.discoverCBDescriptors(MockCBCharacteristic())
+
+        // Assert
+        assertTrue(mockCBPeripheral.verify(exactly = 1, functionName = "discoverDescriptorsForCharacteristic"))
         testPeripheral.disconnect()
       }
     }
 
   @Test
-  fun `discoverDescriptors function returns BleResponse`() =
+  fun `discoverCBDescriptors function returns BleResponse`() =
     runTest {
       repeat(DEFAULT_TEST_RUNS) {
         // Arrange
@@ -274,10 +281,10 @@ class PeripheralTest {
           )
 
         // Act
-        testPeripheral.discoverDescriptors(DEFAULT_UUID) { bleEvent ->
-          // Assert
-          assertTrue(bleEvent is BleResponse.Error) // TODO
-        }
+        val bleEvent = testPeripheral.discoverCBDescriptors(MockCBCharacteristic())
+
+        // Assert
+        assertTrue(bleEvent is OnDescriptorsDiscovered) // TODO
         testPeripheral.disconnect()
       }
     }

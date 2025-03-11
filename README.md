@@ -10,7 +10,7 @@ KMP BLE is Bluetooth Low Energy framework exposing both a high level API for mul
 #### &nbsp;&nbsp;100% code coverage
 #### &nbsp;&nbsp;Implements an innovative mocking solution for Core Bluetooth<br>
 
-> Not a typo! This library implements unit testing mocks for CBCentralManager and CBPeripheral, once thought to be effectively impossible without requiring changes to the production code.
+> Not a typo! This library implements unit testing mocks for CBCentralManager and CBPeripheral without requiring changes to the production code.
 <br>
 
 ## Experimental Features: 
@@ -69,23 +69,28 @@ The BluetoothGattCallback class also changes on a semi-regular basis, most recen
 
 I've tried a variety of solutions and have yet to find the "One Simple Trick". Each approach has advantages and disadvantages.
 
-1) Expose each callback with an "old school" callback interface that forwards the parameters of that GattCallback.
+1) Combine the ble command queue code with the callbacks in one class either by subclassing the BluetoothGattCallback abstract class or implementing it as an internal class.
+
+- Pros: Easy to implement. Callbacks simply call the parent classes functions directly.
+- Cons: The academy award winning film adaptation could be titled "Everything Tightly Coupled To Everything Everywhere All At Once".
+
+2) Expose each callback with an "old school" callback interface that forwards the parameters of that GattCallback.
 
 - Pros: Easy to understand and implement.
 - Cons: Many nearly identical callback interfaces tightly coupled to the BluetoothGattCallback class. Also need to keep track of observers.
 
-2) Expose all callbacks with a single callback interface that passes a Result class.
+3) Expose all callbacks with a single callback interface that passes a Result class.
 
 - Pros: Decoupled from the BluetoothGattCallback.
 - Cons: Confusing Result parameters. Also need to keep track of observers.
 
-3) Expose all callbacks using a single observer list that implement the BluetoothGattCallback interface, itself.
+4) Expose all callbacks using a single observer list that implement the BluetoothGattCallback interface, itself.
 
 - Pros: BluetoothGattCallback class is an abstract class with default implementations for every callback. So each observer only needs to override the callback it wants to observe. 
 Very insulated against changes to BluetoothGattCallback class.
 - Cons: Forwarding an interface to observers implementing the same interface is confusing and unintuitive. Too clever for its own good.
 
-4) Expose events using an event bus.
+5) Expose events using an event bus.
 
 - Pros: Highly scalable. Very simple implementation. Observers merely subscribe to events.
 - Cons: The required event classes are very tightly coupled to the BluetoothGattCallback class.
@@ -108,14 +113,14 @@ Lint configuration is defined in .editorconfig file in the project root.
 ```
 
 ### Test
-#### Testing Philosophy
-The testing philosophy for this project can be stated as follows:<br> 
-<center>Untested code doesn't work.</center><br>
-This library will always have 100% unit test code coverage. That said, there currently is no way to obtain code coverage for iOS tests.<br><br>
-<center>Belt With Suspenders.</center><br>
+### Testing Philosophy
+The testing philosophy for this project can be stated as follows:<br>
 
+#### Untested code doesn't work.<br>
+This library will always have 100% unit test code coverage. That said, there currently is no way to obtain code coverage for iOS tests.<br>
+
+#### Belt With Suspenders.<br>
 This project implements tests at the implementation level. So, in addition to proving that the code produces the correct result, the tests need to demonstrate that the code isn't producing the correct result by accident.<br>
-
 
 #### Testing With Code Coverage
 
