@@ -119,6 +119,9 @@ The testing philosophy for this project can be stated as follows:<br>
 #### Untested code doesn't work.<br>
 This library will always have 100% unit test code coverage. That said, there currently is no way to obtain code coverage for iOS tests.<br>
 
+> Mr. Scott cannot give me exact figures, Admiral, so... I will make a guess.<br>
+> *Mr Spock, Star Trek IV: The Voyage Home*</br>
+
 #### Belt With Suspenders.<br>
 This project implements tests at the implementation level. So, in addition to proving that the code produces the correct result, the tests need to demonstrate that the code isn't producing the correct result by accident.<br>
 
