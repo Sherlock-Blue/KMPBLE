@@ -1,7 +1,9 @@
 package com.sherlockblue.kmpble.peripheral
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattDescriptor
 import android.content.Context
 import com.sherlockblue.kmpble.ble.BleResponse
 import com.sherlockblue.kmpble.ble.Service
@@ -229,6 +231,29 @@ actual class Peripheral(
       } ?: continuation.resume(
         BleResponse.Error(message = getErrorMessage(NULL_GATT_ERROR), status = NULL_GATT_ERROR),
       )
+    }
+  }
+
+  // Native function for development not yet exposed in common
+  @SuppressLint("MissingPermission")
+  fun manageSubscription(
+    characteristicUUID: String,
+    subscribe: Boolean,
+    callback: (BleResponse) -> Unit
+  ) {
+    gatt?.let { gatt ->
+      gatt.getCharacteristic(characteristicUUID)?.let { characteristic ->
+        if (gatt.setCharacteristicNotification(characteristic, subscribe)) {
+          writeDescriptor(
+            characteristicUUID, "00002902-0000-1000-8000-00805f9b34fb",
+            if (subscribe) {
+              BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            } else {
+              BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
+            }, callback
+          )
+        }
+      }
     }
   }
 
