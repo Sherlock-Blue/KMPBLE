@@ -22,9 +22,6 @@ class ManageCharacteristicSubscription(
   private val gattCallbackEventBus: SharedFlow<NativeBleEvent>,
   private val commandCallback: CommandCallback,
 ) : BleCommand(bleQueue = bleQueue) {
-  init {
-    enqueue()
-  }
 
   override fun execute() {
     commandCallback(

@@ -26,9 +26,6 @@ class ManageDescriptorSubscriptions(
     private val osVersion: Int = Build.VERSION.SDK_INT,
     private val commandCallback: CommandCallback,
 ) : BleCommand(bleQueue = bleQueue) {
-    init {
-        enqueue()
-    }
 
     private val CCCD_UUID = "00002902-0000-1000-8000-00805f9b34fb"
 
