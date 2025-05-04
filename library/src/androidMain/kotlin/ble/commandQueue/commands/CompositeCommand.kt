@@ -3,19 +3,13 @@ package com.sherlockblue.kmpble.ble.commandQueue.commands
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
 import android.os.Build
 import com.sherlockblue.kmpble.ble.NativeBleEvent
 import com.sherlockblue.kmpble.ble.callbacks.CallbackError
-import com.sherlockblue.kmpble.ble.callbacks.OnCharacteristicWrite
-import com.sherlockblue.kmpble.ble.callbacks.OnDescriptorWrite
 import com.sherlockblue.kmpble.ble.commandQueue.BleQueue
 import com.sherlockblue.kmpble.ble.commandQueue.CommandQueue
-import com.sherlockblue.kmpble.ble.extensions.getDescriptor
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission", "NewApi")
 class CompositeCommand(
