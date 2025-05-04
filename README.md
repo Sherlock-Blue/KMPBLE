@@ -10,7 +10,7 @@ KMP BLE is Bluetooth Low Energy framework exposing both a high level API for mul
 #### &nbsp;&nbsp;100% code coverage
 #### &nbsp;&nbsp;Implements an innovative mocking solution for Core Bluetooth<br>
 
-> Not a typo! This library implements unit testing mocks for CBCentralManager and CBPeripheral without requiring changes to the production code.
+> Not a typo! This library implements unit testing mocks for CBCentralManager and CBPeripheral without requiring changes to the production code. Watch [this video](https://www.youtube.com/watch?v=01C_vXlwyDM) to learn how.
 <br>
 
 ## Experimental Features: 
@@ -101,6 +101,34 @@ Inspiration for the event bus came from these articles on Medium:
 - [Ashish Suthar](https://asissuthar.medium.com/?source=post_page---byline--4b6fa8cb1a37--------------------------------): [*Simple Global Event Bus Using Kotlin SharedFlow*](https://asissuthar.medium.com/simple-global-event-bus-using-kotlin-sharedflow-and-koin-4b6fa8cb1a37)<br>
 
 The event bus architecture is being used for this library because, in addition to supporting BLE functionality under the hood, it can be readily exposed to users.
+
+#### Bluetooth Notifications and the Multiverse of Madness
+
+On Android (but not on iOS), subscribing to notifications for a characteristic is a multi-step process. And to add to the challenge, the first step (i.e. setCharacteristicNotification()) is NOT asynchronous like the rest of Bluetooth and returns a boolean instead of a GATT callback. Then, to complete the process, you ned to write to the characteristics corresponding CCCD descriptor (i.e. UUID = "00002902-0000-1000-8000-00805f9b34fb") which IS asynchronous and DOES trigger a GATT callback. This leads to a variety of possible solutions, some of which are explored in this project’s un-merged branches.
+```code
+manage-subscriptions-as-a-BleCommand
+  ```
+Both steps are packaged in one class. Both call the GATT functions directly.
+
+```code
+manage-subscriptions-as-multiple-BleCommands
+  ```
+The two steps are separated out into two BleCommand classes. Since we’ll need to know if the call succeeds, the ManageCharacteristicSubscription class generates a callback based on the boolean response from the setCharacteristicNotification() command.
+
+```code
+manage-subscriptions-with-composite-queables
+  ```
+The separated BleCommands from the manage-subscriptions-as-multiple-BleCommands branch are executed sequentially by a CompositeCommand class.
+
+```code
+manage-subscriptions-with-composite-commands
+  ```
+The separated BleCommands from the manage-subscriptions-as-multiple-BleCommands branch are added to a List and processed through a local command queue like macros. This should work for other multi-step use cases.
+
+```code
+manage-subscriptions-in-peripheral
+  ```
+This is similar to the structure of the manage-subscriptions-as-a-BleCommand branch. But it is located at a higher level, i.e. in the Peripheral class.
 
 ## Usage: Build, Test, Publish
 ### Build
