@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission", "NewApi")
-class ManageSubscriptions(
+class ManageDescriptorSubscriptions(
     private val gatt: BluetoothGatt,
     private val characteristic: BluetoothGattCharacteristic,
     private val subscribe: Boolean = false,
